@@ -1,0 +1,34 @@
+This is a simple todo list for the financial database project. Read the elements one by one after each step that you completed. If there are changes, update the todo list. 
+
+✅ In market analysis section: Add more technical indicators and visualization. Try to add fundamentals, too.  Instead of "deep tech" button, write indicator names and make an interactive chart.
+  - Replaced "Deep Tech" button with individual RSI and MACD checkbox toggles
+  - Each indicator chart toggles independently
+  - Added a "Fundamentals" section below the chart with 12 key metrics (P/E, EPS, Beta, ROE, etc.)
+
+✅ In portfolio section: Make a dashboard showing the performance of the portfolio. Try to add more metrics and visualization. 
+  - Added asset allocation pie chart (donut style)
+  - Added portfolio vs S&P 500 benchmark comparison chart
+  - Summary cards show Total Invested, Current Value, and Total P&L
+
+✅ In overview section: Symbol names are wrong. For example AMD symbol it's name shows as AMD it should be Advanced Micro Devices, Inc. 
+  - Backend now fetches real company names via yf.Ticker().info for each symbol in the screener
+
+✅ In currency converter section: The Swap button between the two input boxes doesn't work
+  - Changed the swap indicator from a static div to a clickable button with swapCurrencies() function
+
+✅ Portfolio Analytics: In your "Portfolio" tab, go beyond just showing current holdings. Add historical Performance & Loss (P&L) tracking, asset allocation pie charts, and benchmark comparisons (e.g., comparing their portfolio's return against the Stock Market's return).
+  - Pie chart shows asset allocation by current market value
+  - Benchmark chart compares portfolio total return % vs S&P 500 1-year returns
+  - P&L tracking in both dollar and percentage per position
+
+✅ Custom Price Alerts: Allow users to set push notifications or emails when an asset crosses a specific price threshold or experiences a sudden percentage drop/spike. (Send message via Telegram bot)
+  - Price alert form in Portfolio tab: set ticker, condition (above/below), target price, Telegram chat ID
+  - Alerts stored in localStorage and checked every 60 seconds
+  - Backend /api/alert/telegram endpoint sends formatted messages via Telegram Bot API
+  - Users need to provide their own bot_token for Telegram delivery
+
+✅ Implement feeds where users can see what others are doing, or allow them to automatically copy the trades of top-performing investors on the platform. You can fetch data from Investing.com or Yahoo Finance.
+  - New "Market Pulse" tab showing trending tickers with real-time insights
+  - Backend /api/social-feed endpoint fetches top 10 trending stocks (AAPL, NVDA, TSLA, etc.)
+  - Each feed card shows price, change %, volume spike indicator, and human-readable insight
+  - Click any card to jump to full Market Analysis
