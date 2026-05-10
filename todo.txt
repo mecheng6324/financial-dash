@@ -32,3 +32,9 @@ This is a simple todo list for the financial database project. Read the elements
   - Backend /api/social-feed endpoint fetches top 10 trending stocks (AAPL, NVDA, TSLA, etc.)
   - Each feed card shows price, change %, volume spike indicator, and human-readable insight
   - Click any card to jump to full Market Analysis
+
+✅ Enhanced Crypto Tracker: A dedicated section for cryptocurrency with real-time tracking, gas fees, and fear & greed index.
+  - New "Crypto Tracker" view added to the sidebar
+  - Live Fear & Greed Index from alternative.me API
+  - Simulated ETH Gas network tracker for Slow/Standard/Fast speeds
+  - Real-time price and volume data for top crypto assets like BTC, ETH, SOL, etc.
