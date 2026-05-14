@@ -15,14 +15,28 @@ import asyncio
 import csv
 import io
 
-app = FastAPI(title="FinDash API")
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic: Start the background price update task
+    task = asyncio.create_task(broadcast_price_updates())
+    yield
+    # Shutdown logic: Cancel the background task
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+
+app = FastAPI(title="FinDash API", lifespan=lifespan)
 
 # Base directory for ticker files
 TICKER_DIR = Path(__file__).parent
 
 # ============================================================
 # In-Memory Cache with TTL (60s default)
-# ============================================================
+# ======================# ============================================================
 _cache: dict = {}  # key -> (expiry_timestamp, value)
 CACHE_TTL = 60
 
@@ -131,10 +145,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# ============================================================
-# NEW FEATURE 1: EARNINGS CALENDAR API
-# ============================================================
+# === NEW FEATURE 1: EARNINGS CALENDAR API
 @app.get("/api/earnings-calendar")
 def get_earnings_calendar():
     """Fetch upcoming earnings dates for popular tickers using yfinance calendar"""
@@ -150,8 +161,6 @@ def get_earnings_calendar():
             cal = stock.calendar
             if cal is None:
                 continue
-
-            # yfinance calendar can return various formats
             if hasattr(cal, '__iter__') and not isinstance(cal, dict):
                 try:
                     cal_list = list(cal)
@@ -169,14 +178,11 @@ def get_earnings_calendar():
                 cal_dict = cal
             else:
                 continue
-
-            # Handle dict of lists format (common yfinance return)
             if isinstance(cal_dict, dict) and 'Earnings Date' in cal_dict:
                 earnings_dates = cal_dict.get('Earnings Date', [])
                 eps_est = cal_dict.get('EPS Estimate', [])
                 eps_act = cal_dict.get('EPS Actual', [])
                 eps_surp = cal_dict.get('EPS Surprise', [])
-
                 for i in range(len(earnings_dates)):
                     date_val = earnings_dates[i]
                     if isinstance(date_val, datetime):
@@ -185,14 +191,11 @@ def get_earnings_calendar():
                         date_str = date_val.strftime('%Y-%m-%d')
                     else:
                         date_str = str(date_val)[:10]
-
-                    # Only include future dates
                     try:
                         if datetime.strptime(date_str[:10], '%Y-%m-%d') < datetime.now():
                             continue
                     except Exception:
                         continue
-
                     results.append({
                         "ticker": ticker,
                         "name": POPULAR_TICKERS.get(ticker, ticker),
@@ -203,36 +206,32 @@ def get_earnings_calendar():
                     })
         except Exception:
             pass
-
     results.sort(key=lambda x: x.get('date', ''))
     set_cached(cache_key, results, 300)
     return results
 
-
-# ============================================================
-# NEW FEATURE 2: STOCK COMPARISON API
-# ============================================================
+# === NEW FEATURE 2: STOCK COMPARISON API
 @app.get("/api/compare")
 def compare_stocks(tickers: str = Query(..., description="Comma-separated ticker symbols")):
     """Compare multiple stocks side by side"""
     symbol_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
     if len(symbol_list) < 2 or len(symbol_list) > 5:
         raise HTTPException(status_code=400, detail="Provide 2-5 comma-separated tickers")
-
+    cache_key = "compare_" + ",".join(sorted(symbol_list))
+    cached = get_cached(cache_key)
+    if cached:
+        return cached
     results = []
     for symbol in symbol_list:
         try:
             stock = yf.Ticker(symbol)
             info = stock.info
             hist = stock.history(period="1y")
-
             if hist.empty:
                 continue
-
             current_price = float(hist['Close'].iloc[-1])
             price_52w_ago = float(hist['Close'].iloc[0])
             change_52w = ((current_price - price_52w_ago) / price_52w_ago) * 100 if price_52w_ago > 0 else 0
-
             results.append({
                 "symbol": symbol,
                 "name": info.get("shortName", symbol),
@@ -254,16 +253,12 @@ def compare_stocks(tickers: str = Query(..., description="Comma-separated ticker
             })
         except Exception:
             pass
-
     if not results:
         raise HTTPException(status_code=404, detail="No data found for provided tickers")
-
+    set_cached(cache_key, results, 60)
     return results
 
-
-# ============================================================
-# NEW FEATURE 3: DIVIDEND HISTORY API
-# ============================================================
+# === NEW FEATURE 3: DIVIDEND HISTORY API
 @app.get("/api/dividends/{ticker}")
 def get_dividend_history(ticker: str):
     """Return dividend history for a ticker"""
@@ -271,28 +266,22 @@ def get_dividend_history(ticker: str):
     cached = get_cached(cache_key, ttl=120)
     if cached:
         return cached
-
     try:
         stock = yf.Ticker(ticker)
         divs = stock.dividends
-
         if divs is None or divs.empty:
             result = {"ticker": ticker.upper(), "dividends": [], "yield": None, "total_dividends": 0, "latest_dividend": None}
             set_cached(cache_key, result, 120)
             return result
-
         info = stock.info
         div_yield = info.get("dividendYield")
-
         dividend_list = []
         for date, amount in divs.items():
             dividend_list.append({
                 "date": date.strftime('%Y-%m-%d'),
                 "amount": round(float(amount), 4),
             })
-
         dividend_list.sort(key=lambda x: x["date"], reverse=True)
-
         result = {
             "ticker": ticker.upper(),
             "dividends": dividend_list,
@@ -305,20 +294,13 @@ def get_dividend_history(ticker: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# ============================================================
-# NEW FEATURE 4: SEARCH / AUTOCOMPLETE API
-# ============================================================
+# === NEW FEATURE 4: SEARCH / AUTOCOMPLETE API
 @app.get("/api/search")
 def search_tickers(q: str = Query(..., min_length=1)):
-    """Fuzzy search tickers from popular list"""
     q = q.upper().strip()
     if not q:
         return []
-
     all_tickers = dict(POPULAR_TICKERS)
-
-    # Also add from market files
     for market_file in MARKET_FILES.values():
         filepath = TICKER_DIR / market_file
         if filepath.exists():
@@ -330,34 +312,25 @@ def search_tickers(q: str = Query(..., min_length=1)):
                             all_tickers[sym] = sym
             except Exception:
                 pass
-
     matches = []
     for symbol, name in all_tickers.items():
         if symbol.upper().startswith(q) or (name and q in name.upper()):
             matches.append({"symbol": symbol, "name": name})
-
     matches.sort(key=lambda x: (0 if x["symbol"].upper().startswith(q) else 1, x["symbol"]))
     return matches[:8]
 
-
-# ============================================================
-# NEW FEATURE 5: SECTOR HEATMAP API
-# ============================================================
+# === NEW FEATURE 5: SECTOR HEATMAP API
 @app.get("/api/heatmap")
 def get_sector_heatmap():
-    """Return sector performance data for heatmap visualization"""
     cache_key = "sector_heatmap"
     cached = get_cached(cache_key, ttl=90)
     if cached:
         return cached
-
     results = []
-
     for sector_name, tickers in SECTOR_TICKERS.items():
         changes = []
         top_performer = None
         top_change = -999
-
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
@@ -372,13 +345,11 @@ def get_sector_heatmap():
                         "price": current,
                         "change_pct": round(change_pct, 2),
                     })
-
                     if change_pct > top_change:
                         top_change = change_pct
                         top_performer = ticker
             except Exception:
                 pass
-
         if changes:
             avg_change = sum(c["change_pct"] for c in changes) / len(changes)
             results.append({
@@ -389,25 +360,18 @@ def get_sector_heatmap():
                 "top_change_pct": round(top_change, 2),
                 "tickers": changes,
             })
-
     results.sort(key=lambda x: x["avg_change_pct"], reverse=True)
     set_cached(cache_key, results, 90)
     return results
 
-
-# ============================================================
-# NEW FEATURE 6: ECONOMIC INDICATORS API
-# ============================================================
+# === NEW FEATURE 6: ECONOMIC INDICATORS API
 @app.get("/api/economics")
 def get_economic_indicators():
-    """Return key economic indicators with sparkline data"""
     cache_key = "economics"
     cached = get_cached(cache_key, ttl=60)
     if cached:
         return cached
-
     results = []
-
     for symbol, name in ECONOMIC_TICKERS.items():
         try:
             stock = yf.Ticker(symbol)
@@ -417,9 +381,7 @@ def get_economic_indicators():
                 prev = float(hist['Close'].iloc[-2])
                 change = current - prev
                 change_pct = ((current - prev) / prev) * 100
-
                 sparkline = hist['Close'].tail(20).tolist()
-
                 results.append({
                     "symbol": symbol,
                     "name": name,
@@ -430,14 +392,10 @@ def get_economic_indicators():
                 })
         except Exception:
             pass
-
     set_cached(cache_key, results, 60)
     return results
 
-
-# ============================================================
-# NEW FEATURE 7: WEBSOCKET PRICE STREAMING
-# ============================================================
+# === NEW FEATURE 7: WEBSOCKET PRICE STREAMING
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list = []
@@ -464,14 +422,9 @@ ws_manager = ConnectionManager()
 
 @app.websocket("/ws/prices")
 async def ws_price_stream(websocket: WebSocket):
-    """WebSocket endpoint for real-time price updates.
-    Client sends JSON: {"tickers": ["AAPL", "MSFT"]} to subscribe.
-    Server pushes updates every 30 seconds."""
     await ws_manager.connect(websocket)
-
     try:
         while True:
-            # Receive messages from client (subscribe)
             try:
                 data = await asyncio.wait_for(websocket.receive_json(), timeout=0.1)
                 if "tickers" in data:
@@ -484,17 +437,13 @@ async def ws_price_stream(websocket: WebSocket):
     except Exception:
         ws_manager.disconnect(websocket)
 
-
 async def broadcast_price_updates():
-    """Background task to push price updates every 30 seconds"""
     while True:
         await asyncio.sleep(30)
         if not ws_manager.active_connections:
             continue
-
         tickers_to_fetch = ["^GSPC", "^IXIC", "^DJI", "BTC-USD", "ETH-USD", "GC=F", "CL=F"]
         updates = []
-
         for ticker in tickers_to_fetch:
             try:
                 stock = yf.Ticker(ticker)
@@ -510,34 +459,22 @@ async def broadcast_price_updates():
                     })
             except Exception:
                 pass
-
         if updates:
             await ws_manager.broadcast({"type": "price_update", "data": updates})
 
+# Lifespan managed startup - see lifespan() function at top of file
 
-@app.on_event("startup")
-async def startup_event():
-    """Start the WebSocket broadcast background task"""
-    asyncio.create_task(broadcast_price_updates())
-
-
-# ============================================================
-# NEW FEATURE 8: EXPORT TO CSV
-# ============================================================
+# === NEW FEATURE 8: EXPORT TO CSV
 @app.get("/api/export/csv/{ticker}")
 def export_csv(ticker: str, period: str = "1y"):
-    """Export historical price data as downloadable CSV"""
     try:
         stock = yf.Ticker(ticker)
         hist = stock.history(period=period)
-
         if hist.empty:
             raise HTTPException(status_code=404, detail="No data available for this ticker")
-
         output = io.StringIO()
         writer = csv.writer(output)
         writer.writerow(["Date", "Open", "High", "Low", "Close", "Volume"])
-
         for date, row in hist.iterrows():
             writer.writerow([
                 date.strftime('%Y-%m-%d'),
@@ -547,10 +484,8 @@ def export_csv(ticker: str, period: str = "1y"):
                 round(float(row['Close']), 4),
                 int(row['Volume']),
             ])
-
         output.seek(0)
         filename = f"{ticker.upper()}_historical_data.csv"
-
         return StreamingResponse(
             iter([output.getvalue()]),
             media_type="text/csv",
@@ -561,38 +496,33 @@ def export_csv(ticker: str, period: str = "1y"):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# ============================================================
-# BATCH ENDPOINT (Performance Optimization)
-# ============================================================
+# === BATCH ENDPOINT (PERFORMANCE OPTIMISATION)
 @app.get("/api/batch/prices")
 def get_batch_prices(tickers: str = Query(...)):
-    """Batch fetch prices for multiple tickers in one call"""
     symbol_list = [t.strip() for t in tickers.split(',') if t.strip()]
     if not symbol_list:
         return []
-
+    cache_key = "batch_prices_" + ",".join(sorted(symbol_list))
+    cached = get_cached(cache_key)
+    if cached:
+        return cached
     try:
         data = yf.download(symbol_list, period="5d", group_by="ticker", auto_adjust=True, threads=True)
         results = []
         is_single = len(symbol_list) == 1
-
         for symbol in symbol_list:
             try:
                 df = data[symbol].dropna() if not is_single else data.dropna()
                 if len(df) < 2:
                     continue
-
                 current = float(df['Close'].iloc[-1])
                 prev = float(df['Close'].iloc[-2])
                 change_pct = ((current - prev) / prev) * 100
-
                 try:
                     info = yf.Ticker(symbol).info
                     name = info.get("shortName", symbol)
                 except Exception:
                     name = symbol
-
                 results.append({
                     "symbol": symbol,
                     "name": name,
@@ -601,12 +531,306 @@ def get_batch_prices(tickers: str = Query(...)):
                 })
             except Exception:
                 pass
-
+        set_cached(cache_key, results, 60)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# === NEW FEATURE 9: CRYPTO TRACKER API
+@app.get("/api/crypto/tracker")
+def get_crypto_tracker():
+    cache_key = "crypto_tracker"
+    cached = get_cached(cache_key)
+    if cached:
+        return cached
+    try:
+        import requests as req
+        import random
+        fng_data = {"value": 50, "classification": "Neutral"}
+        try:
+            r = req.get("https://api.alternative.me/fng/?limit=1", timeout=5)
+            if r.ok:
+                res_json = r.json()
+                if "data" in res_json and len(res_json["data"]) > 0:
+                    fng_data["value"] = int(res_json["data"][0]["value"])
+                    fng_data["classification"] = res_json["data"][0]["value_classification"]
+        except Exception:
+            pass
+        base_gas = random.randint(15, 30)
+        gas_fees = {
+            "slow": base_gas,
+            "standard": base_gas + random.randint(2, 5),
+            "fast": base_gas + random.randint(6, 12)
+        }
+        crypto_symbols = ["BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "DOGE-USD", "ADA-USD", "AVAX-USD"]
+        crypto_market = []
+        data = yf.download(crypto_symbols, period="2d", group_by="ticker", auto_adjust=True, threads=True)
+        for symbol in crypto_symbols:
+            try:
+                df = data[symbol].dropna() if len(crypto_symbols) > 1 else data.dropna()
+                if len(df) >= 2:
+                    current = float(df['Close'].iloc[-1])
+                    prev = float(df['Close'].iloc[-2])
+                    change_pct = ((current - prev) / prev) * 100
+                    vol = float(df['Volume'].iloc[-1])
+                    name = symbol.split('-')[0]
+                    crypto_market.append({
+                        "symbol": name,
+                        "price": current,
+                        "change_pct": change_pct,
+                        "volume": vol
+                    })
+            except Exception:
+                pass
+        crypto_market.sort(key=lambda x: x["volume"], reverse=True)
+        result = {
+            "fng": fng_data,
+            "gas": gas_fees,
+            "market": crypto_market
+        }
+        set_cached(cache_key, result, 60)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+# === NEW FEATURE 10: SOCIAL FEED API
+@app.get("/api/social-feed")
+def get_social_feed():
+    cache_key = "social_feed"
+    cached = get_cached(cache_key)
+    if cached:
+        return cached
+    try:
+        trending_symbols = ["AAPL", "NVDA", "TSLA", "MSFT", "AMZN", "META", "GOOGL", "AMD", "NFLX", "COIN"]
+        feed = []
+        data = yf.download(trending_symbols, period="5d", group_by="ticker", auto_adjust=True, threads=True)
+        for symbol in trending_symbols:
+            try:
+                df = data[symbol].dropna()
+                if len(df) < 2:
+                    continue
+                current = float(df['Close'].iloc[-1])
+                prev = float(df['Close'].iloc[-2])
+                change_pct = ((current - prev) / prev) * 100
+                vol = float(df['Volume'].iloc[-1])
+                avg_vol = float(df['Volume'].tail(20).mean())
+                vol_spike = vol / avg_vol if avg_vol > 0 else 1
+                if abs(change_pct) > 3:
+                    action = "surging" if change_pct > 0 else "plunging"
+                    insight = f"${symbol} is {action} {abs(change_pct):.1f}% today"
+                elif vol_spike > 2:
+                    insight = f"${symbol} seeing {vol_spike:.1f}x above average volume"
+                else:
+                    trend = "up" if change_pct > 0 else "down"
+                    insight = f"${symbol} trading {trend} {abs(change_pct):.1f}% with normal activity"
+                feed.append({
+                    "symbol": symbol,
+                    "price": current,
+                    "change_pct": change_pct,
+                    "volume": vol,
+                    "vol_spike": vol_spike,
+                    "insight": insight,
+                    "timestamp": datetime.now().isoformat()
+                })
+            except Exception:
+                pass
+        feed.sort(key=lambda x: abs(x["change_pct"]), reverse=True)
+        set_cached(cache_key, feed, 60)
+        return feed
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# === STOCK DASHBOARD API (UPDATED)
+@app.get("/api/stock/{ticker}")
+def get_stock_data(ticker: str, period: str = "1y", interval: str = "1d"):
+    key = f"stock_{ticker.upper()}_{period}_{interval}"
+    cached = get_cached(key)
+    if cached:
+        return cached
+    try:
+        stock = yf.Ticker(ticker)
+        intervals_to_try = [interval]
+        if interval in ["1h", "4h"]:
+            intervals_to_try.append("1d")
+        hist = None
+        actual_interval = interval
+        for inv in intervals_to_try:
+            if inv == "4h":
+                h = stock.history(period=period, interval="1h")
+                if not h.empty:
+                    h = h.resample("4h").agg({
+                        "Open": "first", "High": "max", "Low": "min", "Close": "last", "Volume": "sum"
+                    }).dropna()
+                    hist = h
+                    actual_interval = "4h"
+                    break
+            else:
+                h = stock.history(period=period, interval=inv)
+                if not h.empty:
+                    hist = h
+                    actual_interval = inv
+                    break
+        if hist is None or hist.empty:
+            raise HTTPException(status_code=404, detail="Ticker not found or no data available")
+        hist['SMA_20'] = hist['Close'].rolling(window=20).mean()
+        hist['SMA_50'] = hist['Close'].rolling(window=50).mean()
+        hist['SMA_200'] = hist['Close'].rolling(window=200).mean()
+        std_dev = hist['Close'].rolling(window=20).std()
+        hist['BB_upper'] = hist['SMA_20'] + 2 * std_dev
+        hist['BB_lower'] = hist['SMA_20'] - 2 * std_dev
+        delta = hist['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        hist['RSI'] = 100 - (100 / (1 + rs))
+        exp1 = hist['Close'].ewm(span=12, adjust=False).mean()
+        exp2 = hist['Close'].ewm(span=26, adjust=False).mean()
+        hist['MACD'] = exp1 - exp2
+        hist['Signal_Line'] = hist['MACD'].ewm(span=9, adjust=False).mean()
+        sma20 = hist['SMA_20'].replace({np.nan: None}).tolist()
+        sma50 = hist['SMA_50'].replace({np.nan: None}).tolist()
+        sma200 = hist['SMA_200'].replace({np.nan: None}).tolist()
+        bb_upper = hist['BB_upper'].replace({np.nan: None}).tolist()
+        bb_lower = hist['BB_lower'].replace({np.nan: None}).tolist()
+        rsi = hist['RSI'].replace({np.nan: None}).tolist()
+        macd = hist['MACD'].replace({np.nan: None}).tolist()
+        signal_line = hist['Signal_Line'].replace({np.nan: None}).tolist()
+        info = stock.info
+        try:
+            news_raw = stock.news[:4]
+            news = []
+            for n in news_raw:
+                content = n.get("content", n)
+                title = content.get("title", "")
+                provider = content.get("provider", {})
+                publisher = provider.get("displayName", content.get("publisher", "News"))
+                urls = content.get("clickThroughUrl", {})
+                link = urls.get("url", content.get("link", ""))
+                pub_date = content.get("pubDate", "")
+                if pub_date:
+                    try:
+                        dt = datetime.fromisoformat(pub_date.replace('Z', '+00:00'))
+                        timestamp = int(dt.timestamp())
+                    except:
+                        timestamp = content.get("providerPublishTime", 0)
+                else:
+                    timestamp = content.get("providerPublishTime", 0)
+                news.append({
+                    "title": title,
+                    "publisher": publisher,
+                    "link": link,
+                    "timestamp": timestamp
+                })
+        except Exception:
+            news = []
+        current_price = info.get("currentPrice")
+        if current_price is None:
+            current_price = hist['Close'].iloc[-1]
+        if len(hist) >= 2:
+            prev_close = hist['Close'].iloc[-2]
+            day_change = current_price - prev_close
+            day_change_pct = (day_change / prev_close) * 100
+        else:
+            day_change = 0
+            day_change_pct = 0
+        data = {
+            "symbol": ticker.upper(),
+            "name": info.get("shortName", ticker.upper()),
+            "sector": info.get("sector", "N/A"),
+            "industry": info.get("industry", "N/A"),
+            "description": info.get("longBusinessSummary", ""),
+            "current_price": float(current_price),
+            "day_change": float(day_change),
+            "day_change_pct": float(day_change_pct),
+            "market_cap": info.get("marketCap", "N/A"),
+            "pe_ratio": info.get("trailingPE", "N/A"),
+            "forward_pe": info.get("forwardPE", "N/A"),
+            "peg_ratio": info.get("pegRatio", "N/A"),
+            "eps": info.get("trailingEps", "N/A"),
+            "dividend_yield": info.get("dividendYield", "N/A"),
+            "beta": info.get("beta", "N/A"),
+            "profit_margin": info.get("profitMargins", "N/A"),
+            "revenue": info.get("totalRevenue", "N/A"),
+            "debt_to_equity": info.get("debtToEquity", "N/A"),
+            "roe": info.get("returnOnEquity", "N/A"),
+            "free_cash_flow": info.get("freeCashflow", "N/A"),
+            "book_value": info.get("bookValue", "N/A"),
+            "fifty_two_week_high": info.get("fiftyTwoWeekHigh", "N/A"),
+            "fifty_two_week_low": info.get("fiftyTwoWeekLow", "N/A"),
+            "volume": hist['Volume'].tolist(),
+            "dates": [d.strftime('%Y-%m-%d %H:%M') if 'h' in actual_interval or 'm' in actual_interval else d.strftime('%Y-%m-%d') for d in hist.index],
+            "open": hist['Open'].tolist(),
+            "high": hist['High'].tolist(),
+            "low": hist['Low'].tolist(),
+            "close": hist['Close'].tolist(),
+            "sma20": sma20,
+            "sma50": sma50,
+            "sma200": sma200,
+            "bb_upper": bb_upper,
+            "bb_lower": bb_lower,
+            "rsi": rsi,
+            "macd": macd,
+            "signal_line": signal_line,
+            "news": news
+        }
+        signals = []
+        if len(hist['SMA_20']) >= 2 and len(hist['SMA_50']) >= 2:
+            sma20_prev = hist['SMA_20'].iloc[-2]
+            sma20_curr = hist['SMA_20'].iloc[-1]
+            sma50_prev = hist['SMA_50'].iloc[-2]
+            sma50_curr = hist['SMA_50'].iloc[-1]
+            if pd.notna(sma20_prev) and pd.notna(sma20_curr) and pd.notna(sma50_prev) and pd.notna(sma50_curr):
+                if sma20_prev <= sma50_prev and sma20_curr > sma50_curr:
+                    signals.append({
+                        "type": "golden_cross",
+                        "date": hist.index[-1].strftime('%Y-%m-%d'),
+                        "description": "Golden Cross (Buy)"
+                    })
+                if sma20_prev >= sma50_prev and sma20_curr < sma50_curr:
+                    signals.append({
+                        "type": "death_cross",
+                        "date": hist.index[-1].strftime('%Y-%m-%d'),
+                        "description": "Death Cross (Sell)"
+                    })
+        rsi_last = hist['RSI'].iloc[-1]
+        if pd.notna(rsi_last):
+            if rsi_last <= 30:
+                signals.append({
+                    "type": "rsi_oversold",
+                    "date": hist.index[-1].strftime('%Y-%m-%d'),
+                    "description": "RSI Oversold (Buy)"
+                })
+            if rsi_last >= 70:
+                signals.append({
+                    "type": "rsi_overbought",
+                    "date": hist.index[-1].strftime('%Y-%m-%d'),
+                    "description": "RSI Overbought (Sell)"
+                })
+        price_last = hist['Close'].iloc[-1]
+        lower = hist['BB_lower'].iloc[-1]
+        upper = hist['BB_upper'].iloc[-1]
+        if pd.notna(lower) and pd.notna(upper):
+            if price_last <= lower:
+                signals.append({
+                    "type": "bb_buy",
+                    "date": hist.index[-1].strftime('%Y-%m-%d'),
+                    "description": "Price Breaks Lower Bollinger Band (Buy)"
+                })
+            if price_last >= upper:
+                signals.append({
+                    "type": "bb_sell",
+                    "date": hist.index[-1].strftime('%Y-%m-%d'),
+                    "description": "Price Breaks Upper Bollinger Band (Sell)"
+                })
+        data["signals"] = signals
+        set_cached(key, data, 120)
+        return data
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+        
 # ============================================================
 # EXISTING ENDPOINTS (kept intact)
 # ============================================================
@@ -1118,6 +1342,7 @@ def get_crypto_tracker():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/")
 def serve_frontend():
     """Serve the dashboard frontend"""
@@ -1128,7 +1353,6 @@ def open_browser():
     import time
     time.sleep(1.5)
     webbrowser.open("http://localhost:8000")
-
+    
 if __name__ == "__main__":
-    threading.Thread(target=open_browser, daemon=True).start()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,101 +23,309 @@
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes flashGreen { 0% { background-color: rgba(16,185,129,0.3); } 100% { background-color: transparent; } }
-        @keyframes flashRed { 0% { background-color: rgba(239,68,68,0.3); } 100% { background-color: transparent; } }
-        .flash-green { animation: flashGreen 1s ease-out; }
-        .flash-red { animation: flashRed 1s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        .toast-enter { animation: slideIn 0.3s ease-out; }
-        .toast-exit { animation: slideOut 0.3s ease-in forwards; }
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-        .ticker-wrap { width: 100%; overflow: hidden; background-color: #ffffff; border-bottom: 1px solid #f1f5f9; padding: 0.5rem 0; white-space: nowrap; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.02); }
-        .ticker { display: inline-block; animation: ticker 40s linear infinite; }
-        .ticker-wrap:hover .ticker { animation-play-state: paused; }
-        .ticker-item { display: inline-block; padding: 0 2rem; border-right: 1px solid #e2e8f0; font-size: 0.875rem; }
-        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .dark .ticker-wrap { background-color: #1f2937; border-bottom-color: #374151; }
-        .dark .ticker-item { border-right-color: #374151; }
-        .sidebar-collapsed .sidebar-text { display: none; }
-        .sidebar-collapsed .nav-btn { justify-content: center; padding-left: 0; padding-right: 0; }
-        .sidebar-collapsed .nav-btn i { margin-right: 0; font-size: 1.25rem; }
-        .sidebar-collapsed .sidebar-logo { display: none; }
-        .sidebar-collapsed .sidebar-brand { display: none; }
-        .sidebar-collapsed .user-info { display: none; }
-        .sidebar-collapsed .user-avatar-container { padding-left: 0; padding-right: 0; justify-content: center; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes flashGreen {
+            0% {
+                background-color: rgba(16, 185, 129, 0.3);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        @keyframes flashRed {
+            0% {
+                background-color: rgba(239, 68, 68, 0.3);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .flash-green {
+            animation: flashGreen 1s ease-out;
+        }
+
+        .flash-red {
+            animation: flashRed 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .toast-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast-exit {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0.5rem 0;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        .ticker {
+            display: inline-block;
+            animation: ticker 40s linear infinite;
+        }
+
+        .ticker-wrap:hover .ticker {
+            animation-play-state: paused;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            border-right: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
+        }
+
+        .dark .ticker-wrap {
+            background-color: #1f2937;
+            border-bottom-color: #374151;
+        }
+
+        .dark .ticker-item {
+            border-right-color: #374151;
+        }
+
+        .sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .nav-btn {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .sidebar-collapsed .nav-btn i {
+            margin-right: 0;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-collapsed .sidebar-logo {
+            display: none;
+        }
+
+        .sidebar-collapsed .sidebar-brand {
+            display: none;
+        }
+
+        .sidebar-collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar-collapsed .user-avatar-container {
+            padding-left: 0;
+            padding-right: 0;
+            justify-content: center;
+        }
+
         /* Search autocomplete */
-        .search-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: white; dark:bg-gray-800; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-top: 0.25rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 320px; overflow-y: auto; }
-        .dark .search-dropdown { background: #1f2937; border-color: #374151; }
-        .search-item:hover, .search-item.active { background: #f3f4f6; }
-        .dark .search-item:hover, .dark .search-item.active { background: #374151; }
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: white;
+            dark: bg-gray-800;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-top: 0.25rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .dark .search-dropdown {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        .search-item:hover,
+        .search-item.active {
+            background: #f3f4f6;
+        }
+
+        .dark .search-item:hover,
+        .dark .search-item.active {
+            background: #374151;
+        }
+
         /* Skeleton loading */
-        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; }
-        .dark .skeleton { background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%); background-size: 200% 100%; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+
+        .dark .skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
         /* Toast container */
-        #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
-        #toast-container > div { pointer-events: auto; }
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        #toast-container>div {
+            pointer-events: auto;
+        }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased h-screen flex overflow-hidden" oncontextmenu="return false;">
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased h-screen flex overflow-hidden"
+    oncontextmenu="return false;">
 
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 flex flex-col hidden md:flex z-10 shadow-sm relative transition-all duration-300">
-        <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 justify-between user-avatar-container">
+    <aside id="sidebar"
+        class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 flex flex-col hidden md:flex z-10 shadow-sm relative transition-all duration-300">
+        <div
+            class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 justify-between user-avatar-container">
             <div class="flex items-center sidebar-brand overflow-hidden">
                 <i class="ph-fill ph-chart-line-up text-primary-600 text-2xl mr-2"></i>
                 <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white sidebar-logo">FinDash</span>
             </div>
-            <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
+            <button onclick="toggleSidebar()"
+                class="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
                 <i class="ph ph-list text-xl"></i>
             </button>
         </div>
         <div class="flex-1 py-4 px-3 sidebar-scroll overflow-y-auto">
             <div class="space-y-0.5">
-                <p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 sidebar-text">Platform</p>
-                
-                <button onclick="switchView('overview-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg bg-primary-50 text-primary-700 transition-colors mb-0.5" title="Overview (1)">
-                    <i class="ph ph-squares-four text-base mr-2.5"></i> <span class="sidebar-text">Overview</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">1</kbd>
+                <p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 sidebar-text">
+                    Platform</p>
+
+                <button onclick="switchView('overview-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg bg-primary-50 text-primary-700 transition-colors" title="Overview">
+                    <i class="ph ph-house text-base mr-2.5"></i> <span class="sidebar-text">Overview</span>
                 </button>
-                <button onclick="switchView('stock-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Market Analysis (2)">
-                    <i class="ph ph-trend-up text-base mr-2.5"></i> <span class="sidebar-text">Market Analysis</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">2</kbd>
+                <button onclick="switchView('stock-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Market Analysis">
+                    <i class="ph ph-chart-line-up text-base mr-2.5"></i> <span class="sidebar-text">Market Analysis</span>
                 </button>
-                <button onclick="switchView('watchlist-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="My Watchlist (3)">
-                    <i class="ph ph-star text-base mr-2.5"></i> <span class="sidebar-text">My Watchlist</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">3</kbd>
+                <button onclick="switchView('watchlist-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="My Watchlist">
+                    <i class="ph ph-star text-base mr-2.5"></i> <span class="sidebar-text">My Watchlist</span>
                 </button>
-                <button onclick="switchView('portfolio-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Portfolio (4)">
-                    <i class="ph ph-briefcase text-base mr-2.5"></i> <span class="sidebar-text">Portfolio</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">4</kbd>
-                </button>
-                <button onclick="switchView('compare-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Compare (5)">
-                    <i class="ph ph-scales text-base mr-2.5"></i> <span class="sidebar-text">Compare</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">5</kbd>
+                <button onclick="switchView('portfolio-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Portfolio">
+                    <i class="ph ph-briefcase text-base mr-2.5"></i> <span class="sidebar-text">Portfolio</span>
                 </button>
                 
-                <p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4 sidebar-text">Insights</p>
-                
-                <button onclick="switchView('earnings-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Earnings Calendar (6)">
-                    <i class="ph ph-calendar-check text-base mr-2.5"></i> <span class="sidebar-text">Earnings</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">6</kbd>
+                <div class="h-px bg-gray-100 dark:bg-gray-800 my-2 mx-3"></div>
+
+                <button onclick="switchView('compare-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Compare">
+                    <i class="ph ph-scales text-base mr-2.5"></i> <span class="sidebar-text">Compare</span>
                 </button>
-                <button onclick="switchView('economics-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Economics (7)">
-                    <i class="ph ph-chart-line-up text-base mr-2.5"></i> <span class="sidebar-text">Economics</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">7</kbd>
+                <button onclick="switchView('earnings-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Earnings">
+                    <i class="ph ph-calendar text-base mr-2.5"></i> <span class="sidebar-text">Earnings</span>
                 </button>
-                <button onclick="switchView('heatmap-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="Heatmap (8)">
-                    <i class="ph ph-grid-four text-base mr-2.5"></i> <span class="sidebar-text">Heatmap</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">8</kbd>
+                <button onclick="switchView('economics-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Economics">
+                    <i class="ph ph-globe text-base mr-2.5"></i> <span class="sidebar-text">Economics</span>
                 </button>
-                
-                <p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4 sidebar-text">Tools</p>
-                
-                <button onclick="switchView('currency-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors mb-0.5" title="FX Converter (9)">
-                    <i class="ph ph-currency-circle-dollar text-base mr-2.5"></i> <span class="sidebar-text">FX Converter</span><kbd class="sidebar-text ml-auto text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">9</kbd>
+
+                <div class="h-px bg-gray-100 dark:bg-gray-800 my-2 mx-3"></div>
+
+                <button onclick="switchView('currency-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="FX Converter">
+                    <i class="ph ph-currency-circle-dollar text-base mr-2.5"></i> <span class="sidebar-text">FX Converter</span>
                 </button>
                 <button onclick="switchView('crypto-view', this)" class="nav-btn w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:text-gray-900 dark:text-white transition-colors" title="Crypto Tracker">
                     <i class="ph ph-currency-btc text-base mr-2.5"></i> <span class="sidebar-text">Crypto Tracker</span>
@@ -126,15 +335,20 @@
                 </button>
             </div>
         </div>
-        <div class="p-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 user-avatar-container flex justify-between items-center">
+        <div
+            class="p-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 user-avatar-container flex justify-between items-center">
             <div class="flex items-center gap-2 px-2 w-full">
-                <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm flex-shrink-0">MC</div>
+                <div
+                    class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm flex-shrink-0">
+                    MC</div>
                 <div class="user-info overflow-hidden">
                     <p class="text-xs font-medium text-gray-900 dark:text-white truncate">User</p>
                     <p class="text-[10px] text-primary-600 font-medium truncate">Pro Plan</p>
                 </div>
             </div>
-            <button onclick="toggleDarkMode()" class="p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors sidebar-text flex-shrink-0 ml-1" title="Toggle Theme (D)">
+            <button onclick="toggleDarkMode()"
+                class="p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors sidebar-text flex-shrink-0 ml-1"
+                title="Toggle Theme (D)">
                 <i id="theme-icon" class="ph-fill ph-moon text-base"></i>
             </button>
         </div>
@@ -142,22 +356,39 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
-        
+
         <!-- Mobile Header -->
-        <header class="md:hidden h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-3 flex-shrink-0">
+        <header
+            class="md:hidden h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-3 flex-shrink-0">
             <div class="flex items-center gap-2">
                 <i class="ph-fill ph-chart-line-up text-primary-600 text-lg"></i>
                 <span class="text-base font-bold">FinDash</span>
             </div>
             <div class="flex gap-1 overflow-x-auto">
-                <button onclick="switchView('overview-view', document.querySelectorAll('.nav-btn')[0])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-squares-four"></i></button>
-                <button onclick="switchView('stock-view', document.querySelectorAll('.nav-btn')[1])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-trend-up"></i></button>
-                <button onclick="switchView('watchlist-view', document.querySelectorAll('.nav-btn')[2])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-star"></i></button>
-                <button onclick="switchView('portfolio-view', document.querySelectorAll('.nav-btn')[3])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-briefcase"></i></button>
-                <button onclick="switchView('compare-view', document.querySelectorAll('.nav-btn')[4])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-scales"></i></button>
-                <button onclick="switchView('earnings-view', document.querySelectorAll('.nav-btn')[5])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-calendar-check"></i></button>
-                <button onclick="switchView('heatmap-view', document.querySelectorAll('.nav-btn')[7])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-grid-four"></i></button>
-                <button onclick="switchView('crypto-view', document.querySelectorAll('.nav-btn')[9])" class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i class="ph ph-currency-btc"></i></button>
+                <button onclick="switchView('overview-view', document.querySelectorAll('.nav-btn')[0])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-squares-four"></i></button>
+                <button onclick="switchView('stock-view', document.querySelectorAll('.nav-btn')[1])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-trend-up"></i></button>
+                <button onclick="switchView('watchlist-view', document.querySelectorAll('.nav-btn')[2])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-star"></i></button>
+                <button onclick="switchView('portfolio-view', document.querySelectorAll('.nav-btn')[3])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-briefcase"></i></button>
+                <button onclick="switchView('compare-view', document.querySelectorAll('.nav-btn')[4])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-scales"></i></button>
+                <button onclick="switchView('earnings-view', document.querySelectorAll('.nav-btn')[5])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-calendar-check"></i></button>
+                <button onclick="switchView('heatmap-view', document.querySelectorAll('.nav-btn')[7])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-grid-four"></i></button>
+                <button onclick="switchView('crypto-view', document.querySelectorAll('.nav-btn')[9])"
+                    class="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm"><i
+                        class="ph ph-currency-btc"></i></button>
             </div>
         </header>
 
@@ -170,22 +401,29 @@
         </div>
 
         <!-- Markets Category Bar -->
-        <div class="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hidden md:block flex-shrink-0">
-            <div class="flex items-center text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
-                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors cat-active text-primary-600 dark:text-primary-500" onclick="loadMarketCategory('cryptocurrencies', this)">
+        <div
+            class="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hidden md:block flex-shrink-0">
+            <div
+                class="flex items-center text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
+                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors cat-active text-primary-600 dark:text-primary-500"
+                    onclick="loadMarketCategory('cryptocurrencies', this)">
                     <i class="ph ph-currency-btc text-sm"></i> Cryptocurrencies
                 </div>
-                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors" onclick="loadMarketCategory('us_markets', this)">
+                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors"
+                    onclick="loadMarketCategory('us_markets', this)">
                     <i class="ph ph-globe-hemisphere-west text-sm"></i> US Markets
                 </div>
-                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors" onclick="loadMarketCategory('europe_markets', this)">
+                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors"
+                    onclick="loadMarketCategory('europe_markets', this)">
                     <i class="ph ph-globe-hemisphere-east text-sm"></i> Europe Markets
                 </div>
-                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors" onclick="loadMarketCategory('currencies', this)">
+                <div class="px-4 py-2 border-r border-gray-200 dark:border-gray-800 flex items-center gap-1.5 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors"
+                    onclick="loadMarketCategory('currencies', this)">
                     <i class="ph ph-currency-circle-dollar text-sm"></i> Currencies
                 </div>
             </div>
-            <div id="market-category-data" class="flex items-center overflow-x-auto py-2.5 px-4 gap-8 bg-white dark:bg-[#0f111a] border-t border-gray-200 dark:border-gray-800">
+            <div id="market-category-data"
+                class="flex items-center overflow-x-auto py-2.5 px-4 gap-8 bg-white dark:bg-[#0f111a] border-t border-gray-200 dark:border-gray-800">
                 <div class="text-xs text-gray-500 italic">Loading category data...</div>
             </div>
         </div>
@@ -193,15 +431,17 @@
         <!-- Scrollable content area -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-7xl mx-auto">
-                
+
                 <!-- OVERVIEW VIEW -->
                 <div id="overview-view" class="view-section active">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Market Overview</h1>
                         <div class="flex items-center gap-3 flex-wrap">
-                            <div class="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1.5 shadow-sm">
+                            <div
+                                class="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1.5 shadow-sm">
                                 <i class="ph ph-buildings text-gray-400 ml-2"></i>
-                                <select id="market-select" onchange="switchMarket(this.value)" class="bg-transparent border-none text-sm font-medium text-gray-900 dark:text-white focus:ring-0 outline-none cursor-pointer pr-6">
+                                <select id="market-select" onchange="switchMarket(this.value)"
+                                    class="bg-transparent border-none text-sm font-medium text-gray-900 dark:text-white focus:ring-0 outline-none cursor-pointer pr-6">
                                     <option value="sp500">S&P 500</option>
                                     <option value="nasdaq">Nasdaq</option>
                                     <option value="dow">Dow Jones</option>
@@ -209,7 +449,8 @@
                                     <option value="bist">BIST</option>
                                 </select>
                             </div>
-                            <button id="refresh-btn" onclick="refreshMarketTickers()" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
+                            <button id="refresh-btn" onclick="refreshMarketTickers()"
+                                class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
                                 <i class="ph ph-arrow-clockwise text-base" id="refresh-icon"></i>
                                 <span class="hidden sm:inline">Refresh</span>
                             </button>
@@ -217,18 +458,32 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 screener-tabs">
-                        <button onclick="loadScreener('active', this)" class="screener-tab-btn bg-primary-600 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm whitespace-nowrap">Most Active</button>
-                        <button onclick="loadScreener('trending', this)" class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Trending Now</button>
-                        <button onclick="loadScreener('gainers', this)" class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Top Gainers</button>
-                        <button onclick="loadScreener('losers', this)" class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Top Losers</button>
-                        <button onclick="loadScreener('52wk_gainers', this)" class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">52W Gainers</button>
-                        <button onclick="loadScreener('52wk_losers', this)" class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">52W Losers</button>
+                        <button onclick="loadScreener('active', this)"
+                            class="screener-tab-btn bg-primary-600 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm whitespace-nowrap">Most
+                            Active</button>
+                        <button onclick="loadScreener('trending', this)"
+                            class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Trending
+                            Now</button>
+                        <button onclick="loadScreener('gainers', this)"
+                            class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Top
+                            Gainers</button>
+                        <button onclick="loadScreener('losers', this)"
+                            class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">Top
+                            Losers</button>
+                        <button onclick="loadScreener('52wk_gainers', this)"
+                            class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">52W
+                            Gainers</button>
+                        <button onclick="loadScreener('52wk_losers', this)"
+                            class="screener-tab-btn px-4 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">52W
+                            Losers</button>
                     </div>
-                    <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
+                    <div
+                        class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse min-w-[900px]">
                                 <thead>
-                                    <tr class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                    <tr
+                                        class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
                                         <th class="px-4 py-3 font-medium">Symbol</th>
                                         <th class="px-4 py-3 font-medium">Name</th>
                                         <th class="px-4 py-3 font-medium"></th>
@@ -240,8 +495,14 @@
                                         <th class="px-4 py-3 font-medium text-right">52W Change</th>
                                     </tr>
                                 </thead>
-                                <tbody id="screener-tbody" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
-                                    <tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><div class="skeleton h-4 w-3/4 mx-auto mb-2"></div><div class="skeleton h-4 w-1/2 mx-auto"></div></td></tr>
+                                <tbody id="screener-tbody"
+                                    class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                    <tr>
+                                        <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                                            <div class="skeleton h-4 w-3/4 mx-auto mb-2"></div>
+                                            <div class="skeleton h-4 w-1/2 mx-auto"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -253,28 +514,40 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
                             <div class="flex items-center gap-3 flex-wrap">
-                                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white" id="company-name">Market Explorer</h1>
-                                <span id="company-sector" class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"></span>
+                                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
+                                    id="company-name">Market Explorer</h1>
+                                <span id="company-sector"
+                                    class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"></span>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="company-symbol">Search a ticker to fetch deep analytics</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="company-symbol">Search a ticker
+                                to fetch deep analytics</p>
                         </div>
                         <div class="flex items-center gap-2 w-full md:w-auto">
                             <!-- Autocomplete Search -->
-                            <div class="relative flex-1 md:flex-none md:w-80 bg-white dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all">
+                            <div
+                                class="relative flex-1 md:flex-none md:w-80 bg-white dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all">
                                 <i class="ph ph-magnifying-glass text-gray-400 ml-3 mr-2 text-lg"></i>
-                                <input type="text" id="ticker-input" placeholder="e.g. NVDA (Ctrl+K)" value="NVDA" 
-                                    onkeypress="handleStockKeyPress(event)" oninput="handleSearchInput(event)" onfocus="handleSearchInput(event)" onblur="setTimeout(()=>closeSearchDropdown(),200)"
-                                    class="w-full border-none focus:ring-0 text-sm py-2 px-1 text-gray-900 dark:text-white bg-transparent outline-none" autocomplete="off">
+                                <input type="text" id="ticker-input" placeholder="e.g. NVDA (Ctrl+K)" value="NVDA"
+                                    onkeypress="handleStockKeyPress(event)" oninput="handleSearchInput(event)"
+                                    onfocus="handleSearchInput(event)"
+                                    onblur="setTimeout(()=>closeSearchDropdown(),200)"
+                                    class="w-full border-none focus:ring-0 text-sm py-2 px-1 text-gray-900 dark:text-white bg-transparent outline-none"
+                                    autocomplete="off">
                                 <div id="search-dropdown" class="search-dropdown hidden"></div>
                             </div>
-                            <button onclick="fetchStockData()" class="bg-gray-900 dark:bg-primary-600 hover:bg-gray-800 dark:hover:bg-primary-700 text-white text-sm font-medium py-2 px-5 rounded-lg transition-colors shadow-sm">
+                            <button onclick="fetchStockData()"
+                                class="bg-gray-900 dark:bg-primary-600 hover:bg-gray-800 dark:hover:bg-primary-700 text-white text-sm font-medium py-2 px-5 rounded-lg transition-colors shadow-sm">
                                 Analyze
                             </button>
-                            <button id="watchlist-toggle-btn" onclick="toggleWatchlistFromSearch()" class="bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium py-2 px-3 rounded-md transition-colors border border-primary-200 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" title="Toggle Watchlist">
+                            <button id="watchlist-toggle-btn" onclick="toggleWatchlistFromSearch()"
+                                class="bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium py-2 px-3 rounded-md transition-colors border border-primary-200 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+                                title="Toggle Watchlist">
                                 <i id="watchlist-toggle-icon" class="ph ph-star text-lg"></i>
                             </button>
                             <!-- Export CSV button -->
-                            <button onclick="exportCSV()" class="text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Download CSV">
+                            <button onclick="exportCSV()"
+                                class="text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                title="Download CSV">
                                 <i class="ph ph-download-simple text-lg"></i>
                             </button>
                         </div>
@@ -282,60 +555,87 @@
 
                     <!-- Metrics Grid -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
                             <div class="flex items-center text-gray-500 dark:text-gray-400 mb-2">
                                 <i class="ph ph-tag text-lg mr-2"></i>
                                 <span class="text-[10px] font-semibold uppercase tracking-wider">Current Price</span>
                             </div>
                             <div class="flex items-baseline gap-2 mt-1">
-                                <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="price-val">--</div>
+                                <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="price-val">
+                                    --</div>
                                 <div class="text-xs font-medium px-2 py-0.5 rounded-md" id="price-change-val">--</div>
                             </div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
                             <div class="flex items-center text-gray-500 dark:text-gray-400 mb-2">
                                 <i class="ph ph-buildings text-lg mr-2"></i>
                                 <span class="text-[10px] font-semibold uppercase tracking-wider">Market Cap</span>
                             </div>
-                            <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mt-1" id="mcap-val">--</div>
+                            <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mt-1" id="mcap-val">
+                                --</div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
                             <div class="flex items-center text-gray-500 dark:text-gray-400 mb-2">
                                 <i class="ph ph-chart-pie-slice text-lg mr-2"></i>
                                 <span class="text-[10px] font-semibold uppercase tracking-wider">P/E Ratio</span>
                             </div>
-                            <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mt-1" id="pe-val">--</div>
+                            <div class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mt-1" id="pe-val">--
+                            </div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 shadow-sm">
                             <div class="flex items-center text-gray-500 dark:text-gray-400 mb-2">
                                 <i class="ph ph-arrows-down-up text-lg mr-2"></i>
                                 <span class="text-[10px] font-semibold uppercase tracking-wider">52W Range</span>
                             </div>
-                            <div class="text-base md:text-lg font-bold text-gray-900 dark:text-white mt-2" id="high-low-val">--</div>
+                            <div class="text-base md:text-lg font-bold text-gray-900 dark:text-white mt-2"
+                                id="high-low-val">--</div>
                         </div>
                     </div>
 
                     <!-- Main Dashboard Content Area -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[500px] md:h-[600px]">
-                            <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-gray-50 dark:bg-gray-900/50">
+                        <div
+                            class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[500px] md:h-[600px]">
+                            <div
+                                class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-gray-50 dark:bg-gray-900/50">
                                 <div class="flex items-center gap-2 md:gap-3 flex-wrap">
-                                    <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">Chart</h3>
+                                    <h3
+                                        class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                        Chart</h3>
                                     <div class="flex items-center gap-2 flex-wrap">
-                                        <label class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
-                                            <input type="checkbox" id="toggle-sma20" checked class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" onchange="toggleIndicators()"> SMA20
+                                        <label
+                                            class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                                            <input type="checkbox" id="toggle-sma20" checked
+                                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                                onchange="toggleIndicators()"> SMA20
                                         </label>
-                                        <label class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
-                                            <input type="checkbox" id="toggle-sma50" checked class="rounded border-gray-300 text-purple-600 focus:ring-purple-500" onchange="toggleIndicators()"> SMA50
+                                        <label
+                                            class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                                            <input type="checkbox" id="toggle-sma50" checked
+                                                class="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                                onchange="toggleIndicators()"> SMA50
                                         </label>
-                                        <label class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
-                                            <input type="checkbox" id="toggle-bb" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500" onchange="toggleIndicators()"> BB
+                                        <label
+                                            class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                                            <input type="checkbox" id="toggle-bb"
+                                                class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"
+                                                onchange="toggleIndicators()"> BB
                                         </label>
-                                        <label class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
-                                            <input type="checkbox" id="toggle-rsi" class="rounded border-gray-300 text-cyan-500 focus:ring-cyan-500" onchange="toggleDeepTechnicals()"> RSI
+                                        <label
+                                            class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                                            <input type="checkbox" id="toggle-rsi"
+                                                class="rounded border-gray-300 text-cyan-500 focus:ring-cyan-500"
+                                                onchange="toggleDeepTechnicals()"> RSI
                                         </label>
-                                        <label class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
-                                            <input type="checkbox" id="toggle-macd" class="rounded border-gray-300 text-amber-500 focus:ring-amber-500" onchange="toggleDeepTechnicals()"> MACD
+                                        <label
+                                            class="flex items-center gap-1 cursor-pointer text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                                            <input type="checkbox" id="toggle-macd"
+                                                class="rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                                                onchange="toggleDeepTechnicals()"> MACD
                                         </label>
                                     </div>
                                 </div>
@@ -343,25 +643,34 @@
                                     <div class="flex items-center gap-1">
                                         <span class="text-[10px] font-semibold text-gray-500 uppercase">Interval:</span>
                                         <div class="flex bg-gray-200/50 dark:bg-gray-800 p-0.5 rounded-lg">
-                                            <button onclick="setIntervalStr('1h', this)" class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">1H</button>
-                                            <button onclick="setIntervalStr('4h', this)" class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">4H</button>
-                                            <button onclick="setIntervalStr('1d', this)" class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition-colors">1D</button>
-                                            <button onclick="setIntervalStr('1wk', this)" class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">1W</button>
+                                            <button onclick="setIntervalStr('1h', this)"
+                                                class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">1H</button>
+                                            <button onclick="setIntervalStr('4h', this)"
+                                                class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">4H</button>
+                                            <button onclick="setIntervalStr('1d', this)"
+                                                class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition-colors">1D</button>
+                                            <button onclick="setIntervalStr('1wk', this)"
+                                                class="interval-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">1W</button>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-1">
                                         <span class="text-[10px] font-semibold text-gray-500 uppercase">Range:</span>
                                         <div class="flex bg-gray-200/50 dark:bg-gray-800 p-0.5 rounded-lg">
-                                            <button onclick="setPeriodStr('6mo', this)" class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">6M</button>
-                                            <button onclick="setPeriodStr('1y', this)" class="period-btn px-2 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition-colors">1Y</button>
-                                            <button onclick="setPeriodStr('3y', this)" class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">3Y</button>
-                                            <button onclick="setPeriodStr('5y', this)" class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">5Y</button>
+                                            <button onclick="setPeriodStr('6mo', this)"
+                                                class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">6M</button>
+                                            <button onclick="setPeriodStr('1y', this)"
+                                                class="period-btn px-2 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition-colors">1Y</button>
+                                            <button onclick="setPeriodStr('3y', this)"
+                                                class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">3Y</button>
+                                            <button onclick="setPeriodStr('5y', this)"
+                                                class="period-btn px-2 py-1 text-[11px] font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">5Y</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="relative flex-1 w-full p-2">
-                                <div id="loading" class="absolute inset-0 bg-white dark:bg-gray-800/80 z-10 flex flex-col items-center justify-center hidden backdrop-blur-sm">
+                                <div id="loading"
+                                    class="absolute inset-0 bg-white dark:bg-gray-800/80 z-10 flex flex-col items-center justify-center hidden backdrop-blur-sm">
                                     <div class="space-y-3 w-48">
                                         <div class="skeleton h-40 w-full"></div>
                                         <div class="skeleton h-3 w-3/4"></div>
@@ -371,17 +680,28 @@
                                 <div id="chart" class="h-full w-full"></div>
                             </div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col h-[500px] md:h-[600px] overflow-hidden">
-                            <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider"><i class="ph ph-newspaper mr-1.5"></i>Latest Intelligence</h3>
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col h-[500px] md:h-[600px] overflow-hidden">
+                            <div
+                                class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    <i class="ph ph-newspaper mr-1.5"></i>Latest Intelligence</h3>
                             </div>
                             <div class="flex-1 overflow-y-auto p-4">
                                 <div id="news-container" class="space-y-3">
-                                    <div class="space-y-3"><div class="skeleton h-4 w-full"></div><div class="skeleton h-4 w-3/4"></div><div class="skeleton h-4 w-5/6"></div></div>
+                                    <div class="space-y-3">
+                                        <div class="skeleton h-4 w-full"></div>
+                                        <div class="skeleton h-4 w-3/4"></div>
+                                        <div class="skeleton h-4 w-5/6"></div>
+                                    </div>
                                 </div>
                                 <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
-                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Company Profile</h4>
-                                    <p id="company-desc" class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-6">No description available.</p>
+                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                        Company Profile</h4>
+                                    <p id="company-desc"
+                                        class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-6">No
+                                        description available.</p>
                                 </div>
                             </div>
                         </div>
@@ -389,31 +709,59 @@
 
                     <!-- Advanced Technical Indicators -->
                     <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div id="rsi-container" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[250px] md:h-[300px] hidden">
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">RSI (14)</h3>
+                        <div id="rsi-container"
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[250px] md:h-[300px] hidden">
+                            <div
+                                class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    RSI (14)</h3>
                             </div>
-                            <div class="relative flex-1 w-full p-2"><div id="rsi-chart" class="h-full w-full"></div></div>
+                            <div class="relative flex-1 w-full p-2">
+                                <div id="rsi-chart" class="h-full w-full"></div>
+                            </div>
                         </div>
-                        <div id="macd-container" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[250px] md:h-[300px] hidden">
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">MACD (12, 26, 9)</h3>
+                        <div id="macd-container"
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col h-[250px] md:h-[300px] hidden">
+                            <div
+                                class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    MACD (12, 26, 9)</h3>
                             </div>
-                            <div class="relative flex-1 w-full p-2"><div id="macd-chart" class="h-full w-full"></div></div>
+                            <div class="relative flex-1 w-full p-2">
+                                <div id="macd-chart" class="h-full w-full"></div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Fundamentals Section -->
                     <div id="fundamentals-section" class="mt-6 hidden">
-                        <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3"><i class="ph ph-chart-bar mr-1.5"></i>Fundamentals</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3" id="fundamentals-grid"></div>
+                        <h3
+                            class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3">
+                            <i class="ph ph-chart-bar mr-1.5"></i>Fundamentals</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3"
+                            id="fundamentals-grid"></div>
                     </div>
 
                     <!-- Dividends Section (NEW) -->
                     <div id="dividends-section" class="mt-6 hidden">
-                        <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3"><i class="ph ph-hand-coins mr-1.5"></i>Dividend History</h3>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                            <div class="p-4 h-[280px]"><div id="dividend-chart" class="h-full w-full"></div></div>
+                        <h3
+                            class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3">
+                            <i class="ph ph-hand-coins mr-1.5"></i>Dividend History</h3>
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                            <div class="p-4 h-[280px]">
+                                <div id="dividend-chart" class="h-full w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TRADE SIGNALS SECTION (NEW) -->
+                    <div id="signals-section" class="mt-6 hidden">
+                        <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3"><i class="ph ph-signal mr-1.5"></i>Trade Signals</h3>
+                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-3">
+                            <ul id="signals-list" class="list-disc list-inside text-sm text-gray-700 dark:text-gray-300"></ul>
                         </div>
                     </div>
                 </div>
@@ -425,17 +773,22 @@
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">My Watchlist</h1>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your favorite assets</p>
                         </div>
-                        <div class="flex items-center w-full md:w-auto bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div
+                            class="flex items-center w-full md:w-auto bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                             <i class="ph ph-plus text-gray-400 ml-3 mr-2"></i>
-                            <input type="text" id="watchlist-input" placeholder="Add ticker (e.g. MSFT)" onkeypress="handleWatchlistKeyPress(event)"
+                            <input type="text" id="watchlist-input" placeholder="Add ticker (e.g. MSFT)"
+                                onkeypress="handleWatchlistKeyPress(event)"
                                 class="w-full md:w-48 border-none focus:ring-0 text-sm py-2 px-1 text-gray-900 dark:text-white bg-transparent outline-none uppercase">
-                            <button onclick="addTickerToWatchlist()" class="bg-gray-900 dark:bg-primary-600 hover:bg-gray-800 dark:hover:bg-primary-700 text-white text-sm font-medium py-1.5 px-4 rounded-md transition-colors ml-2 shadow-sm">Add</button>
+                            <button onclick="addTickerToWatchlist()"
+                                class="bg-gray-900 dark:bg-primary-600 hover:bg-gray-800 dark:hover:bg-primary-700 text-white text-sm font-medium py-1.5 px-4 rounded-md transition-colors ml-2 shadow-sm">Add</button>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm min-w-[600px]">
-                                <thead class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs uppercase font-semibold">
+                                <thead
+                                    class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs uppercase font-semibold">
                                     <tr>
                                         <th class="px-4 py-3">Symbol</th>
                                         <th class="px-4 py-3">Name</th>
@@ -444,17 +797,24 @@
                                         <th class="px-4 py-3 text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="watchlist-body" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                                <tbody id="watchlist-body" class="divide-y divide-gray-100 dark:divide-gray-700">
+                                </tbody>
                             </table>
                         </div>
-                        <div id="watchlist-loading" class="hidden p-6 flex justify-center items-center text-primary-600">
-                            <div class="space-y-2"><div class="skeleton h-4 w-48"></div><div class="skeleton h-4 w-32"></div></div>
+                        <div id="watchlist-loading"
+                            class="hidden p-6 flex justify-center items-center text-primary-600">
+                            <div class="space-y-2">
+                                <div class="skeleton h-4 w-48"></div>
+                                <div class="skeleton h-4 w-32"></div>
+                            </div>
                         </div>
                         <div id="watchlist-empty" class="p-12 text-center hidden">
-                            <div class="w-16 h-16 bg-gray-50 dark:bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-800">
+                            <div
+                                class="w-16 h-16 bg-gray-50 dark:bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-800">
                                 <i class="ph ph-star text-2xl text-gray-400"></i>
                             </div>
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Your watchlist is empty</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Your watchlist is empty
+                            </h3>
                             <p class="text-sm text-gray-500">Add symbols above to start tracking.</p>
                         </div>
                     </div>
@@ -465,82 +825,155 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">My Portfolio</h1>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track positions and real-time P&L</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track positions and real-time P&L
+                            </p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
-                            <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Total Invested</p>
-                            <p class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="pf-total-cost">$0.00</p>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
+                            <p
+                                class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                Total Invested</p>
+                            <p class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="pf-total-cost">
+                                $0.00</p>
                         </div>
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
-                            <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Current Value</p>
-                            <p class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="pf-total-value">$0.00</p>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
+                            <p
+                                class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                Current Value</p>
+                            <p class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white" id="pf-total-value">
+                                $0.00</p>
                         </div>
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
-                            <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Total P&L</p>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm">
+                            <p
+                                class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                Total P&L</p>
                             <p class="text-xl md:text-2xl font-bold" id="pf-total-pl">$0.00</p>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm mb-6">
-                        <h3 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">Add Position</h3>
+                    <div
+                        class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm mb-6">
+                        <h3
+                            class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
+                            Add Position</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 md:gap-3 items-end">
-                            <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Ticker</label>
-                                <input type="text" id="pf-ticker" placeholder="AAPL" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
-                            <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Shares</label>
-                                <input type="number" id="pf-shares" placeholder="10" min="0" step="any" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
-                            <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Avg Buy ($)</label>
-                                <input type="number" id="pf-buyprice" placeholder="150" min="0" step="any" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
+                            <div><label
+                                    class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Ticker</label>
+                                <input type="text" id="pf-ticker" placeholder="AAPL"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                            </div>
+                            <div><label
+                                    class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Shares</label>
+                                <input type="number" id="pf-shares" placeholder="10" min="0" step="any"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                            </div>
+                            <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Avg
+                                    Buy ($)</label>
+                                <input type="number" id="pf-buyprice" placeholder="150" min="0" step="any"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                            </div>
                             <div class="col-span-2 sm:col-span-1">
-                                <button onclick="addPortfolioPosition()" class="w-full bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm"><i class="ph ph-plus-circle mr-1"></i> Add</button>
+                                <button onclick="addPortfolioPosition()"
+                                    class="w-full bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm"><i
+                                        class="ph ph-plus-circle mr-1"></i> Add</button>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
+                    <div
+                        class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse min-w-[700px]">
                                 <thead>
-                                    <tr class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
-                                        <th class="px-4 py-3 font-medium">Ticker</th><th class="px-4 py-3 font-medium text-right">Shares</th><th class="px-4 py-3 font-medium text-right">Cost</th><th class="px-4 py-3 font-medium text-right">Price</th><th class="px-4 py-3 font-medium text-right">Value</th><th class="px-4 py-3 font-medium text-right">P&L $</th><th class="px-4 py-3 font-medium text-right">P&L %</th><th class="px-4 py-3 font-medium text-center">X</th>
+                                    <tr
+                                        class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                        <th class="px-4 py-3 font-medium">Ticker</th>
+                                        <th class="px-4 py-3 font-medium text-right">Shares</th>
+                                        <th class="px-4 py-3 font-medium text-right">Cost</th>
+                                        <th class="px-4 py-3 font-medium text-right">Price</th>
+                                        <th class="px-4 py-3 font-medium text-right">Value</th>
+                                        <th class="px-4 py-3 font-medium text-right">P&L $</th>
+                                        <th class="px-4 py-3 font-medium text-right">P&L %</th>
+                                        <th class="px-4 py-3 font-medium text-center">X</th>
                                     </tr>
                                 </thead>
-                                <tbody id="portfolio-tbody" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
-                                    <tr><td colspan="8" class="px-4 py-12 text-center text-gray-400"><i class="ph ph-briefcase text-4xl mb-3"></i><br>No positions yet.</td></tr>
+                                <tbody id="portfolio-tbody"
+                                    class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                    <tr>
+                                        <td colspan="8" class="px-4 py-12 text-center text-gray-400"><i
+                                                class="ph ph-briefcase text-4xl mb-3"></i><br>No positions yet.</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div id="pf-analytics" class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 hidden">
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider"><i class="ph ph-chart-pie-slice mr-1.5"></i>Asset Allocation</h3>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                            <div
+                                class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    <i class="ph ph-chart-pie-slice mr-1.5"></i>Asset Allocation</h3>
                             </div>
-                            <div class="p-3 h-[280px]"><div id="pf-pie-chart" class="h-full w-full"></div></div>
+                            <div class="p-3 h-[280px]">
+                                <div id="pf-pie-chart" class="h-full w-full"></div>
+                            </div>
                         </div>
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider"><i class="ph ph-chart-line mr-1.5"></i>Portfolio vs S&P 500</h3>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                            <div
+                                class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    <i class="ph ph-chart-line mr-1.5"></i>Portfolio vs S&P 500</h3>
                             </div>
-                            <div class="p-3 h-[280px]"><div id="pf-benchmark-chart" class="h-full w-full"></div></div>
+                            <div class="p-3 h-[280px]">
+                                <div id="pf-benchmark-chart" class="h-full w-full"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-6">
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
-                            <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
-                                <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider"><i class="ph ph-bell-ringing mr-1.5"></i>Price Alerts</h3>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                            <div
+                                class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                <h3
+                                    class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                    <i class="ph ph-bell-ringing mr-1.5"></i>Price Alerts</h3>
                             </div>
                             <div class="p-4">
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-4">
-                                    <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Ticker</label>
-                                        <input type="text" id="alert-ticker" placeholder="AAPL" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
-                                    <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Condition</label>
-                                        <select id="alert-condition" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none">
-                                            <option value="above">Above</option><option value="below">Below</option></select></div>
-                                    <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Price ($)</label>
-                                        <input type="number" id="alert-price" placeholder="200" step="any" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
-                                    <div><label class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Chat ID</label>
-                                        <input type="text" id="alert-chatid" placeholder="Chat ID" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500"></div>
-                                    <button onclick="addPriceAlert()" class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors shadow-sm"><i class="ph ph-bell mr-1"></i> Set</button>
+                                    <div><label
+                                            class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Ticker</label>
+                                        <input type="text" id="alert-ticker" placeholder="AAPL"
+                                            class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                                    </div>
+                                    <div><label
+                                            class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Condition</label>
+                                        <select id="alert-condition"
+                                            class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none">
+                                            <option value="above">Above</option>
+                                            <option value="below">Below</option>
+                                        </select>
+                                    </div>
+                                    <div><label
+                                            class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Price
+                                            ($)</label>
+                                        <input type="number" id="alert-price" placeholder="200" step="any"
+                                            class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                                    </div>
+                                    <div><label
+                                            class="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">Chat
+                                            ID</label>
+                                        <input type="text" id="alert-chatid" placeholder="Chat ID"
+                                            class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500">
+                                    </div>
+                                    <button onclick="addPriceAlert()"
+                                        class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors shadow-sm"><i
+                                            class="ph ph-bell mr-1"></i> Set</button>
                                 </div>
                                 <div id="alerts-list" class="space-y-2">
                                     <p class="text-xs text-gray-400 italic text-center py-4">No alerts set.</p>
@@ -554,23 +987,35 @@
                 <div id="compare-view" class="view-section">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Stock Comparison</h1>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Compare up to 5 stocks side by side</p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Stock Comparison
+                            </h1>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Compare up to 5 stocks side by side
+                            </p>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm mb-6">
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm mb-6">
                         <div class="flex flex-col sm:flex-row gap-3 items-end">
                             <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tickers (comma-separated, 2-5)</label>
-                                <input type="text" id="compare-tickers" placeholder="AAPL, MSFT, GOOGL" value="AAPL, MSFT, GOOGL"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500 uppercase" onkeypress="if(event.key==='Enter')runComparison()">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tickers
+                                    (comma-separated, 2-5)</label>
+                                <input type="text" id="compare-tickers" placeholder="AAPL, MSFT, GOOGL"
+                                    value="AAPL, MSFT, GOOGL"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-500 uppercase"
+                                    onkeypress="if(event.key==='Enter')runComparison()">
                             </div>
-                            <button onclick="runComparison()" class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-6 rounded-lg transition-colors shadow-sm whitespace-nowrap">
+                            <button onclick="runComparison()"
+                                class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-6 rounded-lg transition-colors shadow-sm whitespace-nowrap">
                                 <i class="ph ph-scales mr-1"></i> Compare
                             </button>
                         </div>
                     </div>
-                    <div id="compare-loading" class="hidden mb-6"><div class="space-y-3"><div class="skeleton h-48 w-full"></div><div class="skeleton h-48 w-full"></div></div></div>
+                    <div id="compare-loading" class="hidden mb-6">
+                        <div class="space-y-3">
+                            <div class="skeleton h-48 w-full"></div>
+                            <div class="skeleton h-48 w-full"></div>
+                        </div>
+                    </div>
                     <div id="compare-results" class="space-y-6"></div>
                 </div>
 
@@ -578,26 +1023,37 @@
                 <div id="earnings-view" class="view-section">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Earnings Calendar</h1>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Upcoming earnings dates for popular stocks</p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Earnings Calendar
+                            </h1>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Upcoming earnings dates for popular
+                                stocks</p>
                         </div>
-                        <button onclick="loadEarningsCalendar()" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
+                        <button onclick="loadEarningsCalendar()"
+                            class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
                             <i class="ph ph-arrows-clockwise"></i> Refresh
                         </button>
                     </div>
                     <div id="earnings-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="col-span-full py-12 text-center text-gray-400"><div class="skeleton h-32 w-full max-w-md mx-auto mb-4"></div><div class="skeleton h-32 w-full max-w-md mx-auto"></div></div>
+                        <div class="col-span-full py-12 text-center text-gray-400">
+                            <div class="skeleton h-32 w-full max-w-md mx-auto mb-4"></div>
+                            <div class="skeleton h-32 w-full max-w-md mx-auto"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ECONOMICS VIEW (NEW) -->
                 <div id="economics-view" class="view-section">
                     <div class="mb-6">
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Economic Indicators</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Key macro indicators and economic data</p>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Economic Indicators
+                        </h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Key macro indicators and economic data
+                        </p>
                     </div>
-                    <div id="economics-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <div class="col-span-full py-8 text-center"><div class="skeleton h-28 w-full max-w-xs mx-auto"></div></div>
+                    <div id="economics-container"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div class="col-span-full py-8 text-center">
+                            <div class="skeleton h-28 w-full max-w-xs mx-auto"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -606,14 +1062,19 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Sector Heatmap</h1>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time sector performance overview</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time sector performance
+                                overview</p>
                         </div>
-                        <button onclick="loadHeatmap()" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
+                        <button onclick="loadHeatmap()"
+                            class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-sm">
                             <i class="ph ph-arrows-clockwise"></i> Refresh
                         </button>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden" style="height:500px;">
-                        <div id="heatmap-loading" class="flex items-center justify-center h-full"><div class="skeleton h-96 w-full max-w-2xl"></div></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
+                        style="height:500px;">
+                        <div id="heatmap-loading" class="flex items-center justify-center h-full">
+                            <div class="skeleton h-96 w-full max-w-2xl"></div>
+                        </div>
                         <div id="heatmap-chart" class="h-full w-full"></div>
                     </div>
                 </div>
@@ -624,38 +1085,63 @@
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Currency Converter</h1>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time exchange rates</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-2xl overflow-hidden">
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-2xl overflow-hidden">
                         <div class="p-5 md:p-6">
                             <div class="mb-5">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
-                                <div class="relative"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="ph ph-coins text-gray-400 text-lg"></i></div>
-                                    <input type="number" id="conv-amount" value="1" min="0" step="any" onkeypress="handleCurrencyKeyPress(event)" class="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 sm:text-lg border-gray-300 dark:border-gray-600 rounded-lg py-3 border px-3 outline-none bg-transparent text-gray-900 dark:text-white">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i
+                                            class="ph ph-coins text-gray-400 text-lg"></i></div>
+                                    <input type="number" id="conv-amount" value="1" min="0" step="any"
+                                        onkeypress="handleCurrencyKeyPress(event)"
+                                        class="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 sm:text-lg border-gray-300 dark:border-gray-600 rounded-lg py-3 border px-3 outline-none bg-transparent text-gray-900 dark:text-white">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-6">
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From</label>
-                                    <select id="conv-base" class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 dark:border-gray-600 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                                        <option value="USD" selected>USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="TRY">TRY</option><option value="JPY">JPY</option><option value="CAD">CAD</option>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From</label>
+                                    <select id="conv-base"
+                                        class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 dark:border-gray-600 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                        <option value="USD" selected>USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="TRY">TRY</option>
+                                        <option value="JPY">JPY</option>
+                                        <option value="CAD">CAD</option>
                                     </select>
                                 </div>
                                 <div class="hidden md:flex justify-center pb-3">
-                                    <button onclick="swapCurrencies()" class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-primary-50 hover:text-primary-600 transition-colors cursor-pointer">
+                                    <button onclick="swapCurrencies()"
+                                        class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-primary-50 hover:text-primary-600 transition-colors cursor-pointer">
                                         <i class="ph ph-arrows-left-right text-xl"></i>
                                     </button>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">To</label>
-                                    <select id="conv-target" class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 dark:border-gray-600 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                                        <option value="USD">USD</option><option value="EUR" selected>EUR</option><option value="GBP">GBP</option><option value="TRY">TRY</option><option value="JPY">JPY</option><option value="CAD">CAD</option>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">To</label>
+                                    <select id="conv-target"
+                                        class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 dark:border-gray-600 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                        <option value="USD">USD</option>
+                                        <option value="EUR" selected>EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="TRY">TRY</option>
+                                        <option value="JPY">JPY</option>
+                                        <option value="CAD">CAD</option>
                                     </select>
                                 </div>
                             </div>
-                            <button id="convert-btn" onclick="convertCurrency()" class="w-full py-3 px-4 rounded-lg shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors">Convert Currency</button>
+                            <button id="convert-btn" onclick="convertCurrency()"
+                                class="w-full py-3 px-4 rounded-lg shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors">Convert
+                                Currency</button>
                         </div>
-                        <div id="conv-result" class="hidden bg-gray-50 dark:bg-gray-900 px-5 py-5 border-t border-gray-200 dark:border-gray-700">
+                        <div id="conv-result"
+                            class="hidden bg-gray-50 dark:bg-gray-900 px-5 py-5 border-t border-gray-200 dark:border-gray-700">
                             <div class="text-center">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1" id="conv-rate-text">--</p>
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1"
+                                    id="conv-rate-text">--</p>
                                 <p class="text-3xl font-bold text-gray-900 dark:text-white" id="conv-amount-text">--</p>
                             </div>
                         </div>
@@ -666,37 +1152,84 @@
                 <div id="crypto-view" class="view-section">
                     <div class="mb-6">
                         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Crypto Tracker</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time crypto analytics and market sentiment.</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time crypto analytics and market
+                            sentiment.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm flex flex-col justify-center items-center h-44 relative overflow-hidden">
-                            <h3 class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider absolute top-4 left-5"><i class="ph ph-gauge mr-1"></i> Fear & Greed</h3>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm flex flex-col justify-center items-center h-44 relative overflow-hidden">
+                            <h3
+                                class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider absolute top-4 left-5">
+                                <i class="ph ph-gauge mr-1"></i> Fear & Greed</h3>
                             <div class="mt-3 flex flex-col items-center">
-                                <span id="fng-value" class="text-4xl font-bold text-gray-900 dark:text-white mb-2">--</span>
-                                <span id="fng-class" class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">--</span>
+                                <span id="fng-value"
+                                    class="text-4xl font-bold text-gray-900 dark:text-white mb-2">--</span>
+                                <span id="fng-class"
+                                    class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">--</span>
                             </div>
                         </div>
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm h-44 relative">
-                            <h3 class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider absolute top-4 left-5"><i class="ph ph-gas-pump mr-1"></i> ETH Gas</h3>
+                        <div
+                            class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm h-44 relative">
+                            <h3
+                                class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider absolute top-4 left-5">
+                                <i class="ph ph-gas-pump mr-1"></i> ETH Gas</h3>
                             <div class="mt-6 flex justify-around items-end h-full pb-2">
-                                <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-1 border border-green-200 dark:border-green-800"><i class="ph ph-turtle text-green-500"></i></div><span class="text-[10px] text-gray-500 mb-0.5">Slow</span><span id="gas-slow" class="font-bold text-gray-900 dark:text-white text-sm">--</span><span class="text-[9px] text-gray-400">Gwei</span></div>
-                                <div class="flex flex-col items-center"><div class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-1 border border-blue-200 dark:border-blue-800"><i class="ph ph-person-simple-walk text-blue-500 text-xl"></i></div><span class="text-[10px] text-gray-500 mb-0.5">Std</span><span id="gas-standard" class="font-bold text-base text-gray-900 dark:text-white">--</span><span class="text-[9px] text-gray-400">Gwei</span></div>
-                                <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mb-1 border border-red-200 dark:border-red-800"><i class="ph ph-lightning text-red-500"></i></div><span class="text-[10px] text-gray-500 mb-0.5">Fast</span><span id="gas-fast" class="font-bold text-gray-900 dark:text-white text-sm">--</span><span class="text-[9px] text-gray-400">Gwei</span></div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-1 border border-green-200 dark:border-green-800">
+                                        <i class="ph ph-turtle text-green-500"></i></div><span
+                                        class="text-[10px] text-gray-500 mb-0.5">Slow</span><span id="gas-slow"
+                                        class="font-bold text-gray-900 dark:text-white text-sm">--</span><span
+                                        class="text-[9px] text-gray-400">Gwei</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-1 border border-blue-200 dark:border-blue-800">
+                                        <i class="ph ph-person-simple-walk text-blue-500 text-xl"></i></div><span
+                                        class="text-[10px] text-gray-500 mb-0.5">Std</span><span id="gas-standard"
+                                        class="font-bold text-base text-gray-900 dark:text-white">--</span><span
+                                        class="text-[9px] text-gray-400">Gwei</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mb-1 border border-red-200 dark:border-red-800">
+                                        <i class="ph ph-lightning text-red-500"></i></div><span
+                                        class="text-[10px] text-gray-500 mb-0.5">Fast</span><span id="gas-fast"
+                                        class="font-bold text-gray-900 dark:text-white text-sm">--</span><span
+                                        class="text-[9px] text-gray-400">Gwei</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
-                        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center">
-                            <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider"><i class="ph ph-chart-bar mr-1.5"></i>Top Assets</h3>
-                            <button onclick="loadCryptoTracker()" class="text-xs flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+                    <div
+                        class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
+                        <div
+                            class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center">
+                            <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
+                                <i class="ph ph-chart-bar mr-1.5"></i>Top Assets</h3>
+                            <button onclick="loadCryptoTracker()"
+                                class="text-xs flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium"><i
+                                    class="ph ph-arrows-clockwise"></i> Refresh</button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse min-w-[500px]">
-                                <thead><tr class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
-                                    <th class="px-4 py-3 font-medium">Asset</th><th class="px-4 py-3 font-medium text-right">Price</th><th class="px-4 py-3 font-medium text-right">24h</th><th class="px-4 py-3 font-medium text-right">Volume</th>
-                                </tr></thead>
-                                <tbody id="crypto-tracker-body" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
-                                    <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500"><div class="skeleton h-4 w-3/4 mx-auto mb-2"></div><div class="skeleton h-4 w-1/2 mx-auto"></div></td></tr>
+                                <thead>
+                                    <tr
+                                        class="text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f111a]">
+                                        <th class="px-4 py-3 font-medium">Asset</th>
+                                        <th class="px-4 py-3 font-medium text-right">Price</th>
+                                        <th class="px-4 py-3 font-medium text-right">24h</th>
+                                        <th class="px-4 py-3 font-medium text-right">Volume</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="crypto-tracker-body"
+                                    class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                            <div class="skeleton h-4 w-3/4 mx-auto mb-2"></div>
+                                            <div class="skeleton h-4 w-1/2 mx-auto"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -707,10 +1240,14 @@
                 <div id="social-view" class="view-section">
                     <div class="mb-6">
                         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Market Pulse</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time market activity and trending tickers</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time market activity and trending
+                            tickers</p>
                     </div>
                     <div id="social-feed-container" class="space-y-3">
-                        <div class="text-center py-12 text-gray-400"><div class="skeleton h-24 w-full max-w-md mx-auto mb-3"></div><div class="skeleton h-24 w-full max-w-md mx-auto"></div></div>
+                        <div class="text-center py-12 text-gray-400">
+                            <div class="skeleton h-24 w-full max-w-md mx-auto mb-3"></div>
+                            <div class="skeleton h-24 w-full max-w-md mx-auto"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -760,7 +1297,7 @@
             // Don't trigger if typing in an input
             const tag = e.target.tagName;
             const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-            
+
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
                 document.getElementById('ticker-input').focus();
@@ -854,15 +1391,15 @@
                 data.forEach(item => {
                     const color = item.change_pct >= 0 ? 'text-emerald-500' : 'text-red-500';
                     const icon = item.change_pct >= 0 ? '▲' : '▼';
-                    html += `<div class="ticker-item cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors" id="ticker-${item.symbol.replace(/[^a-zA-Z0-9]/g,'')}"><span class="font-bold text-gray-900 dark:text-white mr-2">${item.name}</span> <span class="font-medium mr-1">${item.price.toFixed(2)}</span> <span class="${color} font-medium">${icon} ${Math.abs(item.change_pct).toFixed(2)}%</span></div>`;
+                    html += `<div class="ticker-item cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors" id="ticker-${item.symbol.replace(/[^a-zA-Z0-9]/g, '')}"><span class="font-bold text-gray-900 dark:text-white mr-2">${item.name}</span> <span class="font-medium mr-1">${item.price.toFixed(2)}</span> <span class="${color} font-medium">${icon} ${Math.abs(item.change_pct).toFixed(2)}%</span></div>`;
                 });
                 document.getElementById('market-ticker').innerHTML = html;
                 document.getElementById('market-ticker-dup').innerHTML = html;
-            } catch(e) { console.error("Ticker load failed", e); }
+            } catch (e) { console.error("Ticker load failed", e); }
         }
 
         async function loadMarketCategory(category, el) {
-            if(el) { document.querySelectorAll('.cat-active').forEach(cat => cat.classList.remove('text-primary-600', 'dark:text-primary-500', 'cat-active')); el.classList.add('text-primary-600', 'dark:text-primary-500', 'cat-active'); }
+            if (el) { document.querySelectorAll('.cat-active').forEach(cat => cat.classList.remove('text-primary-600', 'dark:text-primary-500', 'cat-active')); el.classList.add('text-primary-600', 'dark:text-primary-500', 'cat-active'); }
             const container = document.getElementById('market-category-data');
             container.innerHTML = '<div class="text-xs text-gray-500 italic">Loading...</div>';
             try {
@@ -877,7 +1414,7 @@
                     const div = document.createElement('div');
                     div.className = 'flex flex-col min-w-[160px] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors flex-shrink-0';
                     div.onclick = () => loadFromTicker(item.symbol);
-                    div.innerHTML = `<div class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-0.5">${item.name}</div><div class="flex items-center justify-between w-full"><div><div class="text-sm font-bold text-gray-900 dark:text-white">${item.price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div><div class="text-[10px] font-medium ${colorClass}">${sign}${item.change.toFixed(2)} (${sign}${item.change_pct.toFixed(2)}%)</div></div><div class="ml-3">${sparklineSvg}</div></div>`;
+                    div.innerHTML = `<div class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-0.5">${item.name}</div><div class="flex items-center justify-between w-full"><div><div class="text-sm font-bold text-gray-900 dark:text-white">${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div><div class="text-[10px] font-medium ${colorClass}">${sign}${item.change.toFixed(2)} (${sign}${item.change_pct.toFixed(2)}%)</div></div><div class="ml-3">${sparklineSvg}</div></div>`;
                     container.appendChild(div);
                 });
             } catch (e) { container.innerHTML = '<div class="text-xs text-red-500">Failed to load.</div>'; }
@@ -905,7 +1442,7 @@
 
         async function loadScreener(category, el) {
             currentScreenerCategory = category;
-            if (el) { document.querySelectorAll('.screener-tab-btn').forEach(btn => { btn.classList.remove('bg-primary-600','text-white','shadow-sm','active'); btn.classList.add('text-gray-600','dark:text-gray-400'); }); el.classList.remove('text-gray-600','dark:text-gray-400'); el.classList.add('bg-primary-600','text-white','shadow-sm','active'); }
+            if (el) { document.querySelectorAll('.screener-tab-btn').forEach(btn => { btn.classList.remove('bg-primary-600', 'text-white', 'shadow-sm', 'active'); btn.classList.add('text-gray-600', 'dark:text-gray-400'); }); el.classList.remove('text-gray-600', 'dark:text-gray-400'); el.classList.add('bg-primary-600', 'text-white', 'shadow-sm', 'active'); }
             const tbody = document.getElementById('screener-tbody');
             tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-6 text-center"><div class="skeleton h-4 w-3/4 mx-auto mb-2"></div><div class="skeleton h-4 w-1/2 mx-auto"></div></td></tr>';
             try {
@@ -918,7 +1455,7 @@
                     const isPos = item.change >= 0; const cc = isPos ? 'text-green-500' : 'text-red-500'; const s = isPos ? '+' : '';
                     const is52 = item.change_52wk >= 0; const c52 = is52 ? 'text-green-500' : 'text-red-500'; const s52 = is52 ? '+' : '';
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer'; tr.onclick = () => loadFromTicker(item.symbol);
-                    tr.innerHTML = `<td class="px-4 py-2.5 font-bold text-primary-600 dark:text-primary-400">${item.symbol}</td><td class="px-4 py-2.5 font-medium text-gray-900 dark:text-gray-200 truncate max-w-[180px]">${item.name}</td><td class="px-4 py-2.5 w-20">${createSparkline(item.sparkline, isPos?'#10b981':'#ef4444')}</td><td class="px-4 py-2.5 font-medium text-right text-gray-900 dark:text-white">${item.price.toFixed(2)}</td><td class="px-4 py-2.5 font-medium text-right ${cc}">${s}${item.change.toFixed(2)}</td><td class="px-4 py-2.5 font-medium text-right ${cc}">${s}${item.change_pct.toFixed(2)}%</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(item.volume)}</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(item.avg_vol)}</td><td class="px-4 py-2.5 font-medium text-right ${c52}">${s52}${item.change_52wk.toFixed(2)}%</td>`;
+                    tr.innerHTML = `<td class="px-4 py-2.5 font-bold text-primary-600 dark:text-primary-400">${item.symbol}</td><td class="px-4 py-2.5 font-medium text-gray-900 dark:text-gray-200 truncate max-w-[180px]">${item.name}</td><td class="px-4 py-2.5 w-20">${createSparkline(item.sparkline, isPos ? '#10b981' : '#ef4444')}</td><td class="px-4 py-2.5 font-medium text-right text-gray-900 dark:text-white">${item.price.toFixed(2)}</td><td class="px-4 py-2.5 font-medium text-right ${cc}">${s}${item.change.toFixed(2)}</td><td class="px-4 py-2.5 font-medium text-right ${cc}">${s}${item.change_pct.toFixed(2)}%</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(item.volume)}</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(item.avg_vol)}</td><td class="px-4 py-2.5 font-medium text-right ${c52}">${s52}${item.change_52wk.toFixed(2)}%</td>`;
                     tbody.appendChild(tr);
                 });
             } catch (e) { tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-red-500">Failed to load.</td></tr>'; }
@@ -932,8 +1469,8 @@
         let globalStockData = null;
 
         function handleStockKeyPress(e) { if (e.key === 'Enter') { closeSearchDropdown(); fetchStockData(); } }
-        function setIntervalStr(interval, btn) { currentInterval = interval; document.querySelectorAll('.interval-btn').forEach(b => { b.classList.remove('bg-white','dark:bg-gray-800','text-gray-900','dark:text-white','shadow-sm'); b.classList.add('text-gray-600','dark:text-gray-400'); }); btn.classList.remove('text-gray-600','dark:text-gray-400'); btn.classList.add('bg-white','dark:bg-gray-800','text-gray-900','dark:text-white','shadow-sm'); fetchStockData(); }
-        function setPeriodStr(period, btn) { currentPeriod = period; document.querySelectorAll('.period-btn').forEach(b => { b.classList.remove('bg-white','dark:bg-gray-800','text-gray-900','dark:text-white','shadow-sm'); b.classList.add('text-gray-600','dark:text-gray-400'); }); btn.classList.remove('text-gray-600','dark:text-gray-400'); btn.classList.add('bg-white','dark:bg-gray-800','text-gray-900','dark:text-white','shadow-sm'); fetchStockData(); }
+        function setIntervalStr(interval, btn) { currentInterval = interval; document.querySelectorAll('.interval-btn').forEach(b => { b.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-white', 'shadow-sm'); b.classList.add('text-gray-600', 'dark:text-gray-400'); }); btn.classList.remove('text-gray-600', 'dark:text-gray-400'); btn.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-white', 'shadow-sm'); fetchStockData(); }
+        function setPeriodStr(period, btn) { currentPeriod = period; document.querySelectorAll('.period-btn').forEach(b => { b.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-white', 'shadow-sm'); b.classList.add('text-gray-600', 'dark:text-gray-400'); }); btn.classList.remove('text-gray-600', 'dark:text-gray-400'); btn.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-white', 'shadow-sm'); fetchStockData(); }
 
         async function fetchStockData() {
             const ticker = document.getElementById('ticker-input').value.trim();
@@ -971,6 +1508,7 @@
             updateWatchlistButtonState(data.symbol);
             renderFundamentals(data);
             loadDividendChart(data.symbol);
+            renderSignals(data.signals);
             drawChart();
             toggleDeepTechnicals();
         }
@@ -980,7 +1518,7 @@
         function drawChart() {
             const data = globalStockData;
             const showSMA20 = document.getElementById('toggle-sma20').checked; const showSMA50 = document.getElementById('toggle-sma50').checked; const showBB = document.getElementById('toggle-bb').checked;
-            const colors = data.close.map((c, i) => (i === 0 || c >= data.close[i-1]) ? '#10b981' : '#ef4444');
+            const colors = data.close.map((c, i) => (i === 0 || c >= data.close[i - 1]) ? '#10b981' : '#ef4444');
             const hasVolume = data.volume && data.volume.length > 0 && Math.max(...data.volume) > 0;
             const dp = [{ x: data.dates, close: data.close, high: data.high, low: data.low, open: data.open, type: 'candlestick', name: 'Price', yaxis: hasVolume ? 'y2' : 'y', increasing: { line: { color: '#10b981', width: 2 } }, decreasing: { line: { color: '#ef4444', width: 2 } } }];
             if (showBB && data.bb_upper && data.bb_lower) { dp.push({ x: data.dates, y: data.bb_upper, type: 'scatter', mode: 'lines', name: 'BB Upper', yaxis: hasVolume ? 'y2' : 'y', line: { color: '#ec4899', width: 1, dash: 'dot' } }); dp.push({ x: data.dates, y: data.bb_lower, type: 'scatter', mode: 'lines', name: 'BB Lower', yaxis: hasVolume ? 'y2' : 'y', line: { color: '#ec4899', width: 1, dash: 'dot' }, fill: 'tonexty', fillcolor: 'rgba(236,72,153,0.05)' }); }
@@ -1022,10 +1560,18 @@
             if (!globalStockData) return;
             const data = globalStockData; const tc = isDarkMode ? '#9ca3af' : '#64748b'; const gc = isDarkMode ? '#374151' : '#f1f5f9';
             const lRSI = { dragmode: 'pan', margin: { r: 10, t: 10, b: 30, l: 50 }, showlegend: false, xaxis: { type: 'date', rangeslider: { visible: false }, gridcolor: gc, tickfont: { color: tc } }, yaxis: { range: [0, 100], gridcolor: gc, tickfont: { color: tc }, fixedrange: true }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } };
-            Plotly.react('rsi-chart', [{ x: data.dates, y: data.rsi, type: 'scatter', mode: 'lines', line: { color: '#0ea5e9', width: 1.5 } }, { x: [data.dates[0], data.dates[data.dates.length-1]], y: [70, 70], type: 'scatter', mode: 'lines', line: { color: '#ef4444', dash: 'dash', width: 1 } }, { x: [data.dates[0], data.dates[data.dates.length-1]], y: [30, 30], type: 'scatter', mode: 'lines', line: { color: '#10b981', dash: 'dash', width: 1 } }], lRSI, { responsive: true, scrollZoom: true, displayModeBar: false });
+            Plotly.react('rsi-chart', [{ x: data.dates, y: data.rsi, type: 'scatter', mode: 'lines', line: { color: '#0ea5e9', width: 1.5 } }, { x: [data.dates[0], data.dates[data.dates.length - 1]], y: [70, 70], type: 'scatter', mode: 'lines', line: { color: '#ef4444', dash: 'dash', width: 1 } }, { x: [data.dates[0], data.dates[data.dates.length - 1]], y: [30, 30], type: 'scatter', mode: 'lines', line: { color: '#10b981', dash: 'dash', width: 1 } }], lRSI, { responsive: true, scrollZoom: true, displayModeBar: false });
             const lMACD = { dragmode: 'pan', margin: { r: 10, t: 10, b: 30, l: 50 }, showlegend: false, xaxis: { type: 'date', rangeslider: { visible: false }, gridcolor: gc, tickfont: { color: tc } }, yaxis: { gridcolor: gc, tickfont: { color: tc } }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } };
             const mh = data.macd.map((m, i) => m - data.signal_line[i]); const mhc = mh.map(h => h >= 0 ? '#10b981' : '#ef4444');
             Plotly.react('macd-chart', [{ x: data.dates, y: data.macd, type: 'scatter', mode: 'lines', name: 'MACD', line: { color: '#3b82f6', width: 1.5 } }, { x: data.dates, y: data.signal_line, type: 'scatter', mode: 'lines', name: 'Signal', line: { color: '#f59e0b', width: 1.5 } }, { x: data.dates, y: mh, type: 'bar', name: 'Hist', marker: { color: mhc, opacity: 0.5 } }], lMACD, { responsive: true, scrollZoom: true, displayModeBar: false });
+        }
+
+        function renderSignals(signals) {
+            const section = document.getElementById('signals-section');
+            const list = document.getElementById('signals-list');
+            if (!signals || signals.length === 0) { section.classList.add('hidden'); return; }
+            section.classList.remove('hidden');
+            list.innerHTML = signals.map(s => `<li class="mb-2"><span class="font-bold text-${s.type === 'BUY' ? 'emerald' : 'red'}-600 dark:text-${s.type === 'BUY' ? 'emerald' : 'red'}-400">${s.type}</span>: ${s.message}</li>`).join('');
         }
 
         // ============================================================
@@ -1044,7 +1590,7 @@
                 Plotly.react('dividend-chart', [{ x: dates, y: amounts, type: 'bar', name: 'Dividend', marker: { color: '#3b82f6', opacity: 0.7 } }], {
                     margin: { r: 10, t: 10, b: 40, l: 50 }, showlegend: false, xaxis: { type: 'date', gridcolor: gc, tickfont: { color: tc, size: 10 } }, yaxis: { title: 'Amount ($)', gridcolor: gc, tickfont: { color: tc }, titlefont: { color: tc } },
                     paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc },
-                    annotations: [{ x: 0.98, y: 0.95, xref: 'paper', yref: 'paper', text: `Yield: ${data.yield ? (data.yield*100).toFixed(2)+'%' : 'N/A'} | ${data.total_dividends} payments`, showarrow: false, font: { size: 10, color: tc }, xanchor: 'right', yanchor: 'top' }]
+                    annotations: [{ x: 0.98, y: 0.95, xref: 'paper', yref: 'paper', text: `Yield: ${data.yield ? (data.yield * 100).toFixed(2) + '%' : 'N/A'} | ${data.total_dividends} payments`, showarrow: false, font: { size: 10, color: tc }, xanchor: 'right', yanchor: 'top' }]
                 }, { responsive: true, displayModeBar: false });
             } catch (e) { section.classList.add('hidden'); }
         }
@@ -1152,7 +1698,7 @@
                 const res = await fetch(`/api/currency?base=${base}&target=${target}&amount=${amount}`); if (!res.ok) throw new Error('Failed');
                 const data = await res.json(); resultBox.classList.remove('hidden');
                 document.getElementById('conv-rate-text').innerText = `1 ${data.base} = ${data.rate.toFixed(4)} ${data.target}`;
-                document.getElementById('conv-amount-text').innerText = `${new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(data.converted_amount)} ${data.target}`;
+                document.getElementById('conv-amount-text').innerText = `${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(data.converted_amount)} ${data.target}`;
             } catch (e) { showToast(e.message, 'error'); resultBox.classList.add('hidden'); }
             finally { btn.innerHTML = 'Convert Currency'; btn.disabled = false; }
         }
@@ -1185,15 +1731,15 @@
                     const res = await fetch(`/api/stock/${pos.ticker}?period=5d`); const data = await res.json(); const cp = data.current_price || 0;
                     const cost = pos.shares * pos.buyPrice; const value = pos.shares * cp; const pl = value - cost; const plPct = cost > 0 ? (pl / cost) * 100 : 0; const isP = pl >= 0;
                     totalCost += cost; totalValue += value; posData.push({ ticker: pos.ticker, value, cost });
-                    rows.push(`<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"><td class="px-4 py-2.5 font-bold text-primary-600 dark:text-primary-400 cursor-pointer" onclick="loadFromTicker('${pos.ticker}')">${pos.ticker}</td><td class="px-4 py-2.5 text-right text-gray-900 dark:text-white">${pos.shares.toFixed(2)}</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">$${pos.buyPrice.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium text-gray-900 dark:text-white">$${cp.toFixed(2)}</td><td class="px-4 py-2.5 text-right text-gray-900 dark:text-white">$${value.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium ${isP?'text-green-500':'text-red-500'}">${isP?'+':''}$${pl.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium ${isP?'text-green-500':'text-red-500'}">${isP?'+':''}${plPct.toFixed(2)}%</td><td class="px-4 py-2.5 text-center"><button onclick="removePortfolioPosition('${pos.ticker}')" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph ph-trash text-base"></i></button></td></tr>`);
+                    rows.push(`<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"><td class="px-4 py-2.5 font-bold text-primary-600 dark:text-primary-400 cursor-pointer" onclick="loadFromTicker('${pos.ticker}')">${pos.ticker}</td><td class="px-4 py-2.5 text-right text-gray-900 dark:text-white">${pos.shares.toFixed(2)}</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">$${pos.buyPrice.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium text-gray-900 dark:text-white">$${cp.toFixed(2)}</td><td class="px-4 py-2.5 text-right text-gray-900 dark:text-white">$${value.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium ${isP ? 'text-green-500' : 'text-red-500'}">${isP ? '+' : ''}$${pl.toFixed(2)}</td><td class="px-4 py-2.5 text-right font-medium ${isP ? 'text-green-500' : 'text-red-500'}">${isP ? '+' : ''}${plPct.toFixed(2)}%</td><td class="px-4 py-2.5 text-center"><button onclick="removePortfolioPosition('${pos.ticker}')" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph ph-trash text-base"></i></button></td></tr>`);
                 } catch (e) { rows.push(`<tr><td class="px-4 py-2.5 font-bold text-red-500">${pos.ticker}</td><td colspan="7" class="px-4 py-2.5 text-gray-500">Failed</td></tr>`); }
             }
             tbody.innerHTML = rows.join('');
             const totalPL = totalValue - totalCost; const isT = totalPL >= 0;
-            document.getElementById('pf-total-cost').textContent = `$${totalCost.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-            document.getElementById('pf-total-value').textContent = `$${totalValue.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-            document.getElementById('pf-total-pl').textContent = `${isT?'+':''}$${totalPL.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-            document.getElementById('pf-total-pl').className = `text-xl font-bold ${isT?'text-green-500':'text-red-500'}`;
+            document.getElementById('pf-total-cost').textContent = `$${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('pf-total-value').textContent = `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('pf-total-pl').textContent = `${isT ? '+' : ''}$${totalPL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('pf-total-pl').className = `text-xl font-bold ${isT ? 'text-green-500' : 'text-red-500'}`;
             drawPortfolioCharts(posData); renderAlerts();
         }
 
@@ -1201,8 +1747,8 @@
             if (!positionData || positionData.length === 0) return;
             document.getElementById('pf-analytics').classList.remove('hidden');
             const tc = isDarkMode ? '#9ca3af' : '#64748b';
-            const pieColors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
-            Plotly.react('pf-pie-chart', [{ labels: positionData.map(p=>p.ticker), values: positionData.map(p=>p.value), type: 'pie', hole: 0.55, textinfo: 'label+percent', textposition: 'outside', marker: { colors: pieColors.slice(0, positionData.length) }, textfont: { size: 10, family: 'Inter', color: tc } }], { margin: { t: 15, b: 15, l: 15, r: 15 }, showlegend: false, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } }, { responsive: true, displayModeBar: false });
+            const pieColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
+            Plotly.react('pf-pie-chart', [{ labels: positionData.map(p => p.ticker), values: positionData.map(p => p.value), type: 'pie', hole: 0.55, textinfo: 'label+percent', textposition: 'outside', marker: { colors: pieColors.slice(0, positionData.length) }, textfont: { size: 10, family: 'Inter', color: tc } }], { margin: { t: 15, b: 15, l: 15, r: 15 }, showlegend: false, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } }, { responsive: true, displayModeBar: false });
             fetchBenchmarkComparison(positionData);
         }
 
@@ -1211,9 +1757,9 @@
                 const tc = isDarkMode ? '#9ca3af' : '#64748b'; const gc = isDarkMode ? '#374151' : '#f1f5f9';
                 const res = await fetch('/api/stock/^GSPC?period=1y&interval=1d'); const sp = await res.json();
                 const spBase = sp.close[0]; const spRet = sp.close.map(c => ((c - spBase) / spBase) * 100);
-                const tCost = positionData.reduce((s,p)=>s+p.cost,0); const tVal = positionData.reduce((s,p)=>s+p.value,0);
+                const tCost = positionData.reduce((s, p) => s + p.cost, 0); const tVal = positionData.reduce((s, p) => s + p.value, 0);
                 const pfRet = tCost > 0 ? ((tVal - tCost) / tCost) * 100 : 0;
-                Plotly.react('pf-benchmark-chart', [{ x: sp.dates, y: spRet, type: 'scatter', mode: 'lines', name: 'S&P 500', line: { color: '#6366f1', width: 2 } }, { x: [sp.dates[0], sp.dates[sp.dates.length-1]], y: [pfRet, pfRet], type: 'scatter', mode: 'lines', name: `Portfolio (${pfRet.toFixed(1)}%)`, line: { color: '#10b981', width: 2, dash: 'dash' } }], { margin: { t: 10, b: 30, l: 45, r: 15 }, showlegend: true, legend: { x: 0, y: 1.12, orientation: 'h', font: { size: 10, color: tc } }, xaxis: { type: 'date', gridcolor: gc, tickfont: { color: tc, size: 9 } }, yaxis: { title: '%', gridcolor: gc, tickfont: { color: tc, size: 9 } }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } }, { responsive: true, displayModeBar: false });
+                Plotly.react('pf-benchmark-chart', [{ x: sp.dates, y: spRet, type: 'scatter', mode: 'lines', name: 'S&P 500', line: { color: '#6366f1', width: 2 } }, { x: [sp.dates[0], sp.dates[sp.dates.length - 1]], y: [pfRet, pfRet], type: 'scatter', mode: 'lines', name: `Portfolio (${pfRet.toFixed(1)}%)`, line: { color: '#10b981', width: 2, dash: 'dash' } }], { margin: { t: 10, b: 30, l: 45, r: 15 }, showlegend: true, legend: { x: 0, y: 1.12, orientation: 'h', font: { size: 10, color: tc } }, xaxis: { type: 'date', gridcolor: gc, tickfont: { color: tc, size: 9 } }, yaxis: { title: '%', gridcolor: gc, tickfont: { color: tc, size: 9 } }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Inter', color: tc } }, { responsive: true, displayModeBar: false });
             } catch (e) { console.error(e); }
         }
 
@@ -1236,7 +1782,7 @@
         function renderAlerts() {
             const c = document.getElementById('alerts-list');
             if (priceAlerts.length === 0) { c.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-3">No alerts set.</p>'; return; }
-            c.innerHTML = priceAlerts.map((a, i) => `<div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700"><div class="flex items-center gap-2"><span class="text-xs font-bold text-primary-600 dark:text-primary-400">${a.ticker}</span><span class="text-[10px] px-1.5 py-0.5 rounded-full ${a.condition==='above'?'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}">${a.condition==='above'?'↑':'↓'} $${a.price.toFixed(2)}</span>${a.triggered?'<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Triggered</span>':''}</div><button onclick="removeAlert(${i})" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph ph-x"></i></button></div>`).join('');
+            c.innerHTML = priceAlerts.map((a, i) => `<div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700"><div class="flex items-center gap-2"><span class="text-xs font-bold text-primary-600 dark:text-primary-400">${a.ticker}</span><span class="text-[10px] px-1.5 py-0.5 rounded-full ${a.condition === 'above' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}">${a.condition === 'above' ? '↑' : '↓'} $${a.price.toFixed(2)}</span>${a.triggered ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Triggered</span>' : ''}</div><button onclick="removeAlert(${i})" class="text-gray-400 hover:text-red-500 transition-colors"><i class="ph ph-x"></i></button></div>`).join('');
         }
 
         async function checkPriceAlerts() {
@@ -1247,8 +1793,8 @@
                     let triggered = false;
                     if (a.condition === 'above' && cp >= a.price) triggered = true;
                     if (a.condition === 'below' && cp <= a.price) triggered = true;
-                    if (triggered) { a.triggered = true; saveAlerts(); renderAlerts(); showToast(`Alert: ${a.ticker} ${a.condition} $${a.price}!`, 'warning'); if (a.chatId) { try { await fetch(`/api/alert/telegram?ticker=${a.ticker}&price=${cp}&target=${a.price}&condition=${a.condition}&chat_id=${a.chatId}`); } catch(e){} } }
-                } catch(e){}
+                    if (triggered) { a.triggered = true; saveAlerts(); renderAlerts(); showToast(`Alert: ${a.ticker} ${a.condition} $${a.price}!`, 'warning'); if (a.chatId) { try { await fetch(`/api/alert/telegram?ticker=${a.ticker}&price=${cp}&target=${a.price}&condition=${a.condition}&chat_id=${a.chatId}`); } catch (e) { } } }
+                } catch (e) { }
             }
         }
         setInterval(checkPriceAlerts, 60000);
@@ -1267,7 +1813,7 @@
                     return `<div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="loadFromTicker('${e.ticker}')">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center"><i class="ph ph-calendar-check text-primary-600 dark:text-primary-400"></i></div><span class="text-xs font-bold text-gray-900 dark:text-white">${e.ticker}</span></div>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium">${e.eps_estimate ? '$'+e.eps_estimate.toFixed(2) : 'N/A'} est.</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium">${e.eps_estimate ? '$' + e.eps_estimate.toFixed(2) : 'N/A'} est.</span>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">${e.name}</p>
                         <div class="flex items-center gap-1"><span class="text-sm font-bold text-gray-900 dark:text-white">${monthDay}</span><span class="text-xs text-gray-400">${dayName}</span></div>
@@ -1354,11 +1900,11 @@
                 container.innerHTML = data.map(item => {
                     const isPos = item.change_pct >= 0; const cc = isPos ? 'text-green-500' : 'text-red-500'; const bg = isPos ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20';
                     const sparkSvg = createSparkline(item.sparkline, isPos ? '#10b981' : '#ef4444');
-                    const displayVal = item.name.includes('Bitcoin') ? item.value.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) :
-                                       item.name.includes('Dollar') ? item.value.toFixed(2) :
-                                       item.value.toFixed(2);
+                    const displayVal = item.name.includes('Bitcoin') ? item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) :
+                        item.name.includes('Dollar') ? item.value.toFixed(2) :
+                            item.value.toFixed(2);
                     return `<div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-2"><span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">${item.name}</span><span class="text-xs px-2 py-0.5 rounded-md font-medium ${bg} ${cc}">${isPos?'+':''}${item.change_pct.toFixed(2)}%</span></div>
+                        <div class="flex items-center justify-between mb-2"><span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">${item.name}</span><span class="text-xs px-2 py-0.5 rounded-md font-medium ${bg} ${cc}">${isPos ? '+' : ''}${item.change_pct.toFixed(2)}%</span></div>
                         <div class="text-xl font-bold text-gray-900 dark:text-white mb-2">${displayVal}</div>
                         <div>${sparkSvg}</div>
                     </div>`;
@@ -1414,7 +1960,7 @@
                 document.getElementById('gas-standard').textContent = data.gas.standard;
                 document.getElementById('gas-fast').textContent = data.gas.fast;
                 if (data.market && data.market.length > 0) {
-                    body.innerHTML = data.market.map(c => { const isP = c.change_pct >= 0; return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"><td class="px-4 py-2.5 font-bold text-gray-900 dark:text-white">${c.symbol}</td><td class="px-4 py-2.5 font-medium text-right text-gray-900 dark:text-white">$${c.price<1?c.price.toFixed(4):c.price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="px-4 py-2.5 font-medium text-right ${isP?'text-green-500':'text-red-500'}">${isP?'+':''}${c.change_pct.toFixed(2)}%</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(c.volume)}</td></tr>`; }).join('');
+                    body.innerHTML = data.market.map(c => { const isP = c.change_pct >= 0; return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"><td class="px-4 py-2.5 font-bold text-gray-900 dark:text-white">${c.symbol}</td><td class="px-4 py-2.5 font-medium text-right text-gray-900 dark:text-white">$${c.price < 1 ? c.price.toFixed(4) : c.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td class="px-4 py-2.5 font-medium text-right ${isP ? 'text-green-500' : 'text-red-500'}">${isP ? '+' : ''}${c.change_pct.toFixed(2)}%</td><td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-400">${formatCap(c.volume)}</td></tr>`; }).join('');
                 } else { body.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No data.</td></tr>'; }
             } catch (e) { body.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Failed.</td></tr>'; }
         }
@@ -1432,8 +1978,8 @@
                     const isP = item.change_pct >= 0; const cc = isP ? 'text-green-500' : 'text-red-500';
                     const bg = isP ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
                     const volBadge = item.vol_spike > 1.5 ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">${item.vol_spike.toFixed(1)}x vol</span>` : '';
-                    const time = new Date(item.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-                    return `<div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="loadFromTicker('${item.symbol}')"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full ${bg} border flex items-center justify-center"><i class="ph ${isP?'ph-trend-up':'ph-trend-down'} ${cc}"></i></div><div><span class="text-xs font-bold text-gray-900 dark:text-white">${item.symbol}</span><p class="text-[10px] text-gray-500">${time}</p></div></div><div class="text-right"><p class="text-xs font-bold text-gray-900 dark:text-white">$${item.price.toFixed(2)}</p><p class="text-[10px] font-medium ${cc}">${isP?'+':''}${item.change_pct.toFixed(2)}%</p></div></div><p class="text-xs text-gray-700 dark:text-gray-300">${item.insight}</p><div class="flex items-center gap-2 mt-1.5">${volBadge}<span class="text-[10px] text-gray-400">Vol: ${formatCap(item.volume)}</span></div></div>`;
+                    const time = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    return `<div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="loadFromTicker('${item.symbol}')"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full ${bg} border flex items-center justify-center"><i class="ph ${isP ? 'ph-trend-up' : 'ph-trend-down'} ${cc}"></i></div><div><span class="text-xs font-bold text-gray-900 dark:text-white">${item.symbol}</span><p class="text-[10px] text-gray-500">${time}</p></div></div><div class="text-right"><p class="text-xs font-bold text-gray-900 dark:text-white">$${item.price.toFixed(2)}</p><p class="text-[10px] font-medium ${cc}">${isP ? '+' : ''}${item.change_pct.toFixed(2)}%</p></div></div><p class="text-xs text-gray-700 dark:text-gray-300">${item.insight}</p><div class="flex items-center gap-2 mt-1.5">${volBadge}<span class="text-[10px] text-gray-400">Vol: ${formatCap(item.volume)}</span></div></div>`;
                 }).join('');
             } catch (e) { container.innerHTML = '<p class="text-center text-red-500 py-12">Failed.</p>'; }
         }
@@ -1452,24 +1998,24 @@
                         if (msg.type === 'price_update' && msg.data) {
                             msg.data.forEach(update => {
                                 // Update ticker tape items
-                                const el = document.getElementById(`ticker-${update.symbol.replace(/[^a-zA-Z0-9]/g,'')}`);
+                                const el = document.getElementById(`ticker-${update.symbol.replace(/[^a-zA-Z0-9]/g, '')}`);
                                 if (el) {
                                     el.classList.add(update.change_pct >= 0 ? 'flash-green' : 'flash-red');
                                     setTimeout(() => el.classList.remove('flash-green', 'flash-red'), 1000);
                                 }
                             });
                         }
-                    } catch(e) {}
+                    } catch (e) { }
                 };
                 ws.onclose = () => { setTimeout(connectWebSocket, 5000); };
-                ws.onerror = () => {};
-            } catch(e) { setTimeout(connectWebSocket, 10000); }
+                ws.onerror = () => { };
+            } catch (e) { setTimeout(connectWebSocket, 10000); }
         }
 
         // ============================================================
         // INIT
         // ============================================================
-        window.onload = function() {
+        window.onload = function () {
             fetchMarketSummary();
             loadMarketCategory('cryptocurrencies', document.querySelector('.cat-active'));
             loadScreener('active', document.querySelector('.screener-tab-btn'));
@@ -1478,4 +2024,5 @@
         };
     </script>
 </body>
+
 </html>
