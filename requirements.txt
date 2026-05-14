@@ -7,3 +7,4 @@ requests
 lxml
 python-multipart
 websockets
+aiohttp
