@@ -916,6 +916,19 @@ def get_stock_data(ticker: str, period: str = "1y", interval: str = "1d"):
                     "description": "Price Breaks Upper Bollinger Band (Sell)"
                 })
         data["signals"] = signals
+        
+        # Add enhanced trading insights if no strong signals detected
+        if not signals:
+            # Generate a neutral signal based on MACD momentum
+            trend = "bullish" if macd[-1] > signal_line[-1] else "bearish"
+            strength = "strong" if abs(macd[-1] - signal_line[-1]) > 0.5 else "weak"
+            signals.append({
+                "type": "neutral",
+                "date": hist.index[-1].strftime('%Y-%m-%d'),
+                "description": f"Market showing {strength} {trend} momentum - Hold position"
+            })
+        
+        data["signals"] = signals
         set_cached(key, data, 120)
         return data
     except HTTPException:
@@ -1074,10 +1087,12 @@ def get_screener_data(category: str = "active", market: str = "sp500"):
     if not symbols:
         raise HTTPException(status_code=404, detail=f"No tickers found for market '{market}'. Click refresh to download them.")
 
-    symbols = symbols[:20]
+    # Limit to first 30 symbols for faster loading
+    symbols = symbols[:30]
 
     try:
-        data = yf.download(symbols, period="1y", group_by="ticker", auto_adjust=True, threads=True)
+        # Use shorter period and batch download for speed
+        data = yf.download(symbols, period="5d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
         results = []
 
         is_single = len(symbols) == 1
@@ -1093,10 +1108,11 @@ def get_screener_data(category: str = "active", market: str = "sp500"):
                 change_pct = (change / prev) * 100
 
                 vol = float(df['Volume'].iloc[-1])
-                avg_vol = float(df['Volume'].tail(60).mean())
+                avg_vol = float(df['Volume'].tail(60).mean()) if len(df) >= 60 else float(df['Volume'].mean())
 
-                price_1y_ago = float(df['Close'].iloc[0])
-                change_52wk = ((current - price_1y_ago) / price_1y_ago) * 100
+                # Calculate 52-week change using available data
+                price_start = float(df['Close'].iloc[0])
+                change_52wk = ((current - price_start) / price_start) * 100 if price_start > 0 else 0
 
                 sparkline = df['Close'].tail(20).tolist()
 
