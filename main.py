@@ -14,20 +14,64 @@ import time
 import asyncio
 import csv
 import io
+import aiohttp
+from functools import lru_cache
 
 from contextlib import asynccontextmanager
 
+# Optimized cache with automatic cleanup and size limit
+class TTLCache:
+    def __init__(self, max_size=1000):
+        self._cache = {}
+        self._max_size = max_size
+        self._lock = threading.Lock()
+    
+    def get(self, key: str, ttl: int = 60):
+        """Get value from cache if not expired."""
+        now = time.time()
+        with self._lock:
+            if key in self._cache:
+                exp, val = self._cache[key]
+                if now < exp:
+                    return val
+                else:
+                    del self._cache[key]
+        return None
+    
+    def set(self, key: str, value, ttl: int = 60):
+        """Store value in cache with TTL."""
+        now = time.time()
+        with self._lock:
+            # Cleanup if cache is too large
+            if len(self._cache) >= self._max_size:
+                self._cleanup()
+            self._cache[key] = (now + ttl, value)
+    
+    def _cleanup(self):
+        """Remove expired entries."""
+        now = time.time()
+        expired = [k for k, (exp, _) in self._cache.items() if now >= exp]
+        for k in expired:
+            del self._cache[k]
+    
+    def clear_expired(self):
+        """Public method to clear expired entries."""
+        self._cleanup()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup logic: Start the background price update task
-    task = asyncio.create_task(broadcast_price_updates())
+    # Startup logic
+    cache_cleanup_task = asyncio.create_task(periodic_cache_cleanup())
+    broadcast_task = asyncio.create_task(broadcast_price_updates())
     yield
-    # Shutdown logic: Cancel the background task
-    task.cancel()
-    try:
-        await task
-    except asyncio.CancelledError:
-        pass
+    # Shutdown logic
+    cache_cleanup_task.cancel()
+    broadcast_task.cancel()
+    for task in [cache_cleanup_task, broadcast_task]:
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
 app = FastAPI(title="FinDash API", lifespan=lifespan)
 
@@ -35,23 +79,24 @@ app = FastAPI(title="FinDash API", lifespan=lifespan)
 TICKER_DIR = Path(__file__).parent
 
 # ============================================================
-# In-Memory Cache with TTL (60s default)
-# ======================# ============================================================
-_cache: dict = {}  # key -> (expiry_timestamp, value)
+# Optimized In-Memory Cache with TTL and Size Limit
+# ============================================================
+cache = TTLCache(max_size=500)
 CACHE_TTL = 60
+
+async def periodic_cache_cleanup():
+    """Periodically clean up expired cache entries."""
+    while True:
+        await asyncio.sleep(300)  # Every 5 minutes
+        cache.clear_expired()
 
 def get_cached(key: str, ttl: int = CACHE_TTL):
     """Get value from cache if not expired."""
-    now = time.time()
-    if key in _cache:
-        exp, val = _cache[key]
-        if now < exp:
-            return val
-    return None
+    return cache.get(key, ttl)
 
 def set_cached(key: str, value, ttl: int = CACHE_TTL):
     """Store value in cache with TTL."""
-    _cache[key] = (time.time() + ttl, value)
+    cache.set(key, value, ttl)
 
 # Market file mapping
 MARKET_FILES = {
@@ -120,22 +165,36 @@ EARNINGS_TICKERS = [
 ]
 
 def load_tickers_from_file(market: str) -> list[str]:
+    """Load tickers from file with caching."""
+    cache_key = f"tickers_{market}"
+    cached = get_cached(cache_key, ttl=3600)  # Cache for 1 hour
+    if cached is not None:
+        return cached
+    
     filename = MARKET_FILES.get(market.lower())
     if not filename:
         return []
     filepath = TICKER_DIR / filename
     if not filepath.exists():
-        return []
-    with open(filepath, "r") as f:
-        return [line.strip() for line in f if line.strip()]
+        result = []
+    else:
+        with open(filepath, "r") as f:
+            result = [line.strip() for line in f if line.strip()]
+    
+    set_cached(cache_key, result, 3600)
+    return result
 
 def save_tickers_to_file(market: str, tickers: list[str]):
+    """Save tickers to file and invalidate cache."""
     filename = MARKET_FILES.get(market.lower())
     if not filename:
         return
     filepath = TICKER_DIR / filename
     with open(filepath, "w") as f:
         f.write("\n".join(tickers))
+    # Invalidate the cache for this market
+    cache_key = f"tickers_{market}"
+    cache.set(cache_key, tickers, 3600)  # Update cache with new data
 
 app.add_middleware(
     CORSMiddleware,
@@ -147,7 +206,7 @@ app.add_middleware(
 
 # === NEW FEATURE 1: EARNINGS CALENDAR API
 @app.get("/api/earnings-calendar")
-def get_earnings_calendar():
+async def get_earnings_calendar():
     """Fetch upcoming earnings dates for popular tickers using yfinance calendar"""
     cache_key = "earnings_calendar"
     cached = get_cached(cache_key, ttl=300)  # 5 min cache
@@ -155,12 +214,15 @@ def get_earnings_calendar():
         return cached
 
     results = []
-    for ticker in EARNINGS_TICKERS:
+    # Use ThreadPoolExecutor for parallel fetching
+    import concurrent.futures
+    
+    def fetch_earnings(ticker):
         try:
             stock = yf.Ticker(ticker)
             cal = stock.calendar
             if cal is None:
-                continue
+                return None
             if hasattr(cal, '__iter__') and not isinstance(cal, dict):
                 try:
                     cal_list = list(cal)
@@ -169,15 +231,15 @@ def get_earnings_calendar():
                         if hasattr(cal_df, 'to_dict'):
                             cal_dict = cal_df.to_dict('records')
                         else:
-                            continue
+                            return None
                     else:
-                        continue
+                        return None
                 except Exception:
-                    continue
+                    return None
             elif isinstance(cal, dict):
                 cal_dict = cal
             else:
-                continue
+                return None
             if isinstance(cal_dict, dict) and 'Earnings Date' in cal_dict:
                 earnings_dates = cal_dict.get('Earnings Date', [])
                 eps_est = cal_dict.get('EPS Estimate', [])
@@ -196,16 +258,25 @@ def get_earnings_calendar():
                             continue
                     except Exception:
                         continue
-                    results.append({
+                    return {
                         "ticker": ticker,
                         "name": POPULAR_TICKERS.get(ticker, ticker),
                         "date": date_str[:10],
                         "eps_estimate": float(eps_est[i]) if i < len(eps_est) and eps_est[i] is not None else None,
                         "eps_actual": float(eps_act[i]) if i < len(eps_act) and eps_act[i] is not None else None,
                         "eps_surprise_pct": float(eps_surp[i]) if i < len(eps_surp) and eps_surp[i] is not None else None,
-                    })
+                    }
         except Exception:
             pass
+        return None
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_ticker = {executor.submit(fetch_earnings, ticker): ticker for ticker in EARNINGS_TICKERS}
+        for future in concurrent.futures.as_completed(future_to_ticker):
+            result = future.result()
+            if result:
+                results.append(result)
+    
     results.sort(key=lambda x: x.get('date', ''))
     set_cached(cache_key, results, 300)
     return results
@@ -321,13 +392,16 @@ def search_tickers(q: str = Query(..., min_length=1)):
 
 # === NEW FEATURE 5: SECTOR HEATMAP API
 @app.get("/api/heatmap")
-def get_sector_heatmap():
+async def get_sector_heatmap():
+    """Get sector performance heatmap with parallel fetching."""
     cache_key = "sector_heatmap"
     cached = get_cached(cache_key, ttl=90)
     if cached:
         return cached
-    results = []
-    for sector_name, tickers in SECTOR_TICKERS.items():
+    
+    import concurrent.futures
+    
+    def fetch_sector_data(sector_name, tickers):
         changes = []
         top_performer = None
         top_change = -999
@@ -352,14 +426,25 @@ def get_sector_heatmap():
                 pass
         if changes:
             avg_change = sum(c["change_pct"] for c in changes) / len(changes)
-            results.append({
+            return {
                 "sector": sector_name,
                 "avg_change_pct": round(avg_change, 2),
                 "top_performer": top_performer,
                 "top_performer_name": POPULAR_TICKERS.get(top_performer, top_performer),
                 "top_change_pct": round(top_change, 2),
                 "tickers": changes,
-            })
+            }
+        return None
+    
+    results = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=7) as executor:
+        future_to_sector = {executor.submit(fetch_sector_data, name, ticks): name 
+                          for name, ticks in SECTOR_TICKERS.items()}
+        for future in concurrent.futures.as_completed(future_to_sector):
+            result = future.result()
+            if result:
+                results.append(result)
+    
     results.sort(key=lambda x: x["avg_change_pct"], reverse=True)
     set_cached(cache_key, results, 90)
     return results
@@ -438,29 +523,37 @@ async def ws_price_stream(websocket: WebSocket):
         ws_manager.disconnect(websocket)
 
 async def broadcast_price_updates():
+    """Optimized broadcast with batch fetching."""
     while True:
         await asyncio.sleep(30)
         if not ws_manager.active_connections:
             continue
+        
         tickers_to_fetch = ["^GSPC", "^IXIC", "^DJI", "BTC-USD", "ETH-USD", "GC=F", "CL=F"]
-        updates = []
-        for ticker in tickers_to_fetch:
-            try:
-                stock = yf.Ticker(ticker)
-                hist = stock.history(period="2d")
-                if len(hist) >= 2:
-                    current = float(hist['Close'].iloc[-1])
-                    prev = float(hist['Close'].iloc[-2])
-                    change_pct = ((current - prev) / prev) * 100
-                    updates.append({
-                        "symbol": ticker,
-                        "price": current,
-                        "change_pct": round(change_pct, 2),
-                    })
-            except Exception:
-                pass
-        if updates:
-            await ws_manager.broadcast({"type": "price_update", "data": updates})
+        try:
+            # Batch fetch all tickers at once for better performance
+            data = yf.download(tickers_to_fetch, period="2d", group_by="ticker", threads=True)
+            updates = []
+            
+            for ticker in tickers_to_fetch:
+                try:
+                    df = data[ticker].dropna() if len(tickers_to_fetch) > 1 else data.dropna()
+                    if len(df) >= 2:
+                        current = float(df['Close'].iloc[-1])
+                        prev = float(df['Close'].iloc[-2])
+                        change_pct = ((current - prev) / prev) * 100
+                        updates.append({
+                            "symbol": ticker,
+                            "price": current,
+                            "change_pct": round(change_pct, 2),
+                        })
+                except Exception:
+                    pass
+            
+            if updates:
+                await ws_manager.broadcast({"type": "price_update", "data": updates})
+        except Exception:
+            pass
 
 # Lifespan managed startup - see lifespan() function at top of file
 
