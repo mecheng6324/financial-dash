@@ -735,7 +735,7 @@ def get_social_feed():
 
 # === STOCK DASHBOARD API (UPDATED)
 @app.get("/api/stock/{ticker}")
-def get_stock_data(ticker: str, period: str = "1y", interval: str = "1d"):
+def get_stock_data(ticker: str, period: str = "5d", interval: str = "1d"):
     key = f"stock_{ticker.upper()}_{period}_{interval}"
     cached = get_cached(key)
     if cached:
@@ -1152,7 +1152,7 @@ def get_screener_data(category: str = "active", market: str = "sp500"):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/stock/{ticker}")
-def get_stock_data(ticker: str, period: str = "1y", interval: str = "1d"):
+def get_stock_data(ticker: str, period: str = "5d", interval: str = "1d"):
     try:
         stock = yf.Ticker(ticker)
 

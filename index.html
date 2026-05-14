@@ -757,10 +757,10 @@
                     </div>
 
                     <!-- TRADE SIGNALS SECTION (NEW) -->
-                    <div id="signals-section" class="mt-6 hidden">
-                        <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-3"><i class="ph ph-signal mr-1.5"></i>Trade Signals</h3>
-                        <div class="bg-white dark:bg-[#151924] border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-3">
-                            <ul id="signals-list" class="list-disc list-inside text-sm text-gray-700 dark:text-gray-300"></ul>
+                    <div id="signals-section" class="mt-8 hidden">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4 flex items-center"><i class="ph-fill ph-signal-high mr-2 text-primary-600"></i>Trading Signals</h3>
+                        <div class="bg-gradient-to-r from-primary-50 to-blue-50 dark:from-gray-800 dark:to-gray-800 border-2 border-primary-200 dark:border-gray-700 rounded-xl shadow-md p-5">
+                            <ul id="signals-list" class="space-y-3"></ul>
                         </div>
                     </div>
                 </div>
@@ -1043,9 +1043,9 @@
                 <!-- ECONOMICS VIEW (NEW) -->
                 <div id="economics-view" class="view-section">
                     <div class="mb-6">
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Economic Indicators
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Economic Indicators (US)
                         </h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Key macro indicators and economic data
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Key macro indicators and economic data for United States
                         </p>
                     </div>
                     <div id="economics-container"
@@ -1176,7 +1176,7 @@
                                 <div class="flex flex-col items-center">
                                     <div
                                         class="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-1 border border-green-200 dark:border-green-800">
-                                        <i class="ph ph-turtle text-green-500"></i></div><span
+                                        <i class="ph-fill ph-clock-countdown text-green-500"></i></div><span
                                         class="text-[10px] text-gray-500 mb-0.5">Slow</span><span id="gas-slow"
                                         class="font-bold text-gray-900 dark:text-white text-sm">--</span><span
                                         class="text-[9px] text-gray-400">Gwei</span>
@@ -1568,29 +1568,38 @@
         function renderSignals(signals) {
             const section = document.getElementById('signals-section');
             const list = document.getElementById('signals-list');
-            if (!signals || signals.length === 0) { section.classList.add('hidden'); return; }
+            if (!signals || signals.length === 0) { 
+                // Show a default neutral message instead of hiding
+                section.classList.remove('hidden');
+                list.innerHTML = '<li class="flex items-start p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"><span class="text-blue-600 dark:text-blue-400 mr-3 text-xl">→</span><div><span class="font-bold text-blue-600 dark:text-blue-400 text-base">HOLD</span><p class="text-sm text-gray-600 dark:text-gray-300 mt-1">No strong signals detected. Market is in a neutral state based on current technical indicators.</p></div></li>';
+                return; 
+            }
             section.classList.remove('hidden');
             list.innerHTML = signals.map(s => {
                 // Map signal types to display properties
                 let typeLabel = s.type.toUpperCase();
                 let colorClass = 'gray';
                 let icon = '•';
+                let bgColor = 'bg-white dark:bg-gray-800';
                 
                 if (s.type.includes('BUY') || s.type.includes('golden_cross') || s.type.includes('rsi_oversold') || s.type.includes('bb_buy')) {
                     colorClass = 'emerald';
                     icon = '↑';
                     typeLabel = 'BUY';
+                    bgColor = 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
                 } else if (s.type.includes('SELL') || s.type.includes('death_cross') || s.type.includes('rsi_overbought') || s.type.includes('bb_sell')) {
                     colorClass = 'red';
                     icon = '↓';
                     typeLabel = 'SELL';
+                    bgColor = 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
                 } else if (s.type.includes('neutral')) {
                     colorClass = 'blue';
                     icon = '→';
                     typeLabel = 'HOLD';
+                    bgColor = 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
                 }
                 
-                return `<li class="mb-2 flex items-start"><span class="text-${colorClass}-600 dark:text-${colorClass}-400 mr-2 font-bold">${icon}</span><div><span class="font-bold text-${colorClass}-600 dark:text-${colorClass}-400">${typeLabel}</span>: ${s.description || s.message || 'No description'}</div></li>`;
+                return `<li class="flex items-start p-3 ${bgColor} rounded-lg border border-gray-200 dark:border-gray-700"><span class="text-${colorClass}-600 dark:text-${colorClass}-400 mr-3 text-2xl font-bold">${icon}</span><div><span class="font-bold text-${colorClass}-600 dark:text-${colorClass}-400 text-lg">${typeLabel}</span><p class="text-sm text-gray-700 dark:text-gray-300 mt-1">${s.description || s.message || 'Signal detected based on technical analysis'}</p></div></li>`;
             }).join('');
         }
 
