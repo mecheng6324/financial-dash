@@ -1570,7 +1570,28 @@
             const list = document.getElementById('signals-list');
             if (!signals || signals.length === 0) { section.classList.add('hidden'); return; }
             section.classList.remove('hidden');
-            list.innerHTML = signals.map(s => `<li class="mb-2"><span class="font-bold text-${s.type === 'BUY' ? 'emerald' : 'red'}-600 dark:text-${s.type === 'BUY' ? 'emerald' : 'red'}-400">${s.type}</span>: ${s.message}</li>`).join('');
+            list.innerHTML = signals.map(s => {
+                // Map signal types to display properties
+                let typeLabel = s.type.toUpperCase();
+                let colorClass = 'gray';
+                let icon = '•';
+                
+                if (s.type.includes('BUY') || s.type.includes('golden_cross') || s.type.includes('rsi_oversold') || s.type.includes('bb_buy')) {
+                    colorClass = 'emerald';
+                    icon = '↑';
+                    typeLabel = 'BUY';
+                } else if (s.type.includes('SELL') || s.type.includes('death_cross') || s.type.includes('rsi_overbought') || s.type.includes('bb_sell')) {
+                    colorClass = 'red';
+                    icon = '↓';
+                    typeLabel = 'SELL';
+                } else if (s.type.includes('neutral')) {
+                    colorClass = 'blue';
+                    icon = '→';
+                    typeLabel = 'HOLD';
+                }
+                
+                return `<li class="mb-2 flex items-start"><span class="text-${colorClass}-600 dark:text-${colorClass}-400 mr-2 font-bold">${icon}</span><div><span class="font-bold text-${colorClass}-600 dark:text-${colorClass}-400">${typeLabel}</span>: ${s.description || s.message || 'No description'}</div></li>`;
+            }).join('');
         }
 
         // ============================================================
